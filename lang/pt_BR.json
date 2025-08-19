@@ -1,0 +1,15 @@
+{
+    "validation.required": "O campo :attribute é obrigatório.",
+    "validation.unique": "O campo :attribute já está em uso. Verifique também se não é o caso de softDeletes",
+    "validation.exists": "O campo :attribute selecionado é inválido.",
+    "validation.integer": "O campo :attribute deve ser um número inteiro.",
+    "validation.boolean": "O campo :attribute deve ser verdadeiro ou falso.",
+    "validation.string": "O campo :attribute deve ser um texto.",
+
+    "name": "nome",
+    "parent_id": "menu pai",
+    "order_no": "ordem",
+    "icon": "ícone",
+    "route": "rota",
+    "is_active": "ativo"
+}

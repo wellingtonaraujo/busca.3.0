@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Galeria completa - Tabler Icons (ti ti-)</title>
+
+<!-- Webfont do Tabler (sua fonte) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; padding:18px; background:#f3f4f6; }
+  header{ display:flex; gap:8px; align-items:center; margin-bottom:12px; }
+  input[type="search"]{ flex:1; padding:8px 10px; border-radius:8px; border:1px solid #ddd; }
+  button{ padding:8px 12px; border-radius:8px; border:0; background:#111827;color:white; cursor:pointer }
+  #status{ margin-left:12px; font-size:0.9rem; color:#374151 }
+  .grid{ display:grid; grid-template-columns: repeat(auto-fill,minmax(110px,1fr)); gap:12px; }
+  .item{ background:white; border-radius:8px; padding:12px; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  .item i{ font-size:28px; display:block; margin-bottom:8px; line-height:1; }
+  .label{ font-size:11px; color:#374151; word-break:break-all; }
+  .mini-info{ font-size:12px; color:#6b7280; margin-bottom:8px; }
+</style>
+</head>
+<body>
+<header>
+  <input id="q" type="search" placeholder="Filtrar por nome (ex: user, calculator, building-factory)..." />
+  <button id="btnRenderAll">Renderizar tudo</button>
+  <div id="status">carregando lista de ícones…</div>
+</header>
+
+<div class="mini-info" id="count"></div>
+<div id="grid" class="grid"></div>
+
+<script>
+(async function() {
+  const status = document.getElementById('status');
+  const grid = document.getElementById('grid');
+  const q = document.getElementById('q');
+  const btnRenderAll = document.getElementById('btnRenderAll');
+  const countEl = document.getElementById('count');
+
+  // possíveis URLs onde existe icons.json (tenta em ordem)
+  const JSON_URLS = [
+    'https://unpkg.com/@tabler/icons@latest/icons.json',
+    'https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons.json',
+    'https://cdn.jsdelivr.net/npm/@tabler/icons/icons.json',
+    'https://unpkg.com/@tabler/icons/icons.json',
+    'https://raw.githubusercontent.com/tabler/tabler-icons/master/icons.json'
+  ];
+
+  async function fetchJsonWithFallback(urls) {
+    for (const url of urls) {
+      try {
+        status.textContent = `baixando ${url} ...`;
+        const res = await fetch(url);
+        if (!res.ok) {
+          console.warn('não ok', url, res.status);
+          continue;
+        }
+        const data = await res.json();
+        status.textContent = `lista obtida de ${url}`;
+        return { data, src: url };
+      } catch (err) {
+        console.warn('falha fetch', url, err);
+        // tenta próxima
+      }
+    }
+    throw new Error('Não foi possível baixar icons.json de nenhuma fonte (CORS / offline?).');
+  }
+
+  function extractNamesFromJSON(data) {
+    // várias formas possíveis:
+    if (!data) return [];
+    // 1) Iconify-like: data.icons is object where keys = icon names
+    if (data.icons && typeof data.icons === 'object') {
+      return Object.keys(data.icons);
+    }
+    // 2) Array of objects [{name: 'x'}, ...]
+    if (Array.isArray(data)) {
+      if (data.length === 0) return [];
+      if (typeof data[0] === 'string') return data;
+      const maybeNames = data.map(i => i.name || i.attributes?.name || i.properties?.name || null).filter(Boolean);
+      if (maybeNames.length) return maybeNames;
+    }
+    // 3) object where top-level keys are names
+    if (typeof data === 'object') {
+      return Object.keys(data);
+    }
+    return [];
+  }
+
+  function normalize(name) {
+    // tabler icon names typically usam hífen; normalizamos underscores se houver
+    return name.replace(/_/g,'-');
+  }
+
+  function renderIcons(list, filter = '') {
+    grid.innerHTML = '';
+    const frag = document.createDocumentFragment();
+    const needle = filter.trim().toLowerCase();
+    let rendered = 0;
+
+    for (const raw of list) {
+      const name = normalize(String(raw));
+      if (needle && !name.toLowerCase().includes(needle)) continue;
+
+      const el = document.createElement('div');
+      el.className = 'item';
+      el.innerHTML = `<i class="ti ti-${name}" aria-hidden="true"></i><div class="label">ti-${name}</div>`;
+      frag.appendChild(el);
+      rendered++;
+    }
+    grid.appendChild(frag);
+    countEl.textContent = `${rendered} ícones exibidos (${list.length} disponíveis no total).`;
+    return rendered;
+  }
+
+  // main
+  let names = [];
+  try {
+    const { data, src } = await fetchJsonWithFallback(JSON_URLS);
+    names = extractNamesFromJSON(data).map(normalize).sort();
+    if (!names.length) throw new Error('Nenhum nome de ícone encontrado no JSON recuperado.');
+    status.textContent = `Pronto — ${names.length} ícones encontrados (fonte: ${src}). Use a busca para filtrar.`;
+  } catch (err) {
+    console.error(err);
+    status.textContent = `Erro: ${err.message}`;
+    // dica ao usuário
+    grid.innerHTML = `
+      <div style="padding:12px;background:#fee2e2;border-radius:8px;">
+        <strong>Não foi possível obter a lista automaticamente.</strong>
+        <p>Possíveis causas: CORS (o navegador bloqueou o download), bloqueio de rede, ou você abriu o arquivo via <code>file://</code> (use um servidor local).</p>
+        <p>Opções: 1) Rode <code>python -m http.server</code> na pasta e abra <code>http://localhost:8000</code>  2) Baixe manualmente <code>icons.json</code> de <code>https://unpkg.com/@tabler/icons@latest/icons.json</code> e coloque ao lado do HTML.</p>
+      </div>
+    `;
+    return;
+  }
+
+  // eventos de busca
+  q.addEventListener('input', () => {
+    renderIcons(names, q.value);
+  });
+
+  // botão para renderizar tudo (pode ser pesado)
+  btnRenderAll.addEventListener('click', () => {
+    // confirma se o usuário quer renderizar todos
+    if (!confirm('Renderizar todos os ícones na página pode deixar o navegador lento. Deseja continuar?')) return;
+    renderIcons(names, '');
+  });
+
+  // Por padrão, renderiza um preview (ex.: os 200 primeiros)
+  renderIcons(names.slice(0, 200), '');
+})();
+</script>
+</body>
+</html>

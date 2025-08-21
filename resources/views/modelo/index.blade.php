@@ -49,7 +49,7 @@
                         </tbody>
                     </table>
                     <div class="mt-4 flex justify-center">
-                        {{ $acls->links() }}
+                        {{ $itens->links('pagination::tailwind') }}
                     </div>
                 </div>
             </div>

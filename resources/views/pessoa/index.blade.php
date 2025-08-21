@@ -10,7 +10,7 @@
                     </button>
                 </a>
                 <button class="bg-sky-500 text-white text-2xl px-2 py-1 rounded-l hover:bg-sky-600 flex items-center">
-                    <i class="ti ti-shield"></i>
+                    <i class="ti ti-users"></i>
                 </button>
                 <span>[ADMIN - Pessoa]</span>
             </div>
@@ -27,12 +27,19 @@
                     <table class="min-w-[600px] w-full text-sm text-left border-collapse">
                         <thead class="bg-gray-100 border-b border-gray-300">
                             <tr>
+                                <th class="px-4 py-2 font-semibold">id</th>
                                 <th class="px-4 py-2 font-semibold">Nome</th>
+                                <th class="px-4 py-2 font-semibold">CPF</th>
+                                <th class="px-4 py-2 font-semibold">matricula</th>
+                                <th class="px-4 py-2 font-semibold">Entidade</th>
+                                <th class="px-4 py-2 font-semibold">Contato</th>
+                                <th class="px-4 py-2 font-semibold">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($pessoas as $model)
                                 <tr class="border-b hover:bg-gray-50">
+                                    <td class="px-4 py-2">{{ $model->id }}</td>
                                     <td class="px-4 py-2">{{ $model->nome }}</td>
                                     <td class="px-4 py-2">{{ $model->cpf }}</td>
                                     <td class="px-4 py-2">{{ $model->matricula }}</td>

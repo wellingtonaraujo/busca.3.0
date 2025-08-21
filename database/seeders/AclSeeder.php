@@ -23,6 +23,8 @@ class AclSeeder extends Seeder
             ['name' => 'route','descricao'=>'Rotas de acesso ao sistema'],
             ['name' => 'profileRoute','descricao'=>'Perfil de acesso para rotas'],
             ['name' => 'routeMetodo','descricao'=>'Métodos / Ação das rotas'],
+            ['name' => 'entidade','descricao'=>'Orgãos de Segurança'],
+            ['name' => 'pessoa','descricao'=>'Servidores da segurança pública'],
             ['name' => 'user','descricao'=>'Usuários do sistema'],
         ];
 

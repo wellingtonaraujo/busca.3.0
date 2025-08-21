@@ -28,9 +28,20 @@
                     @endif
                     <h2 class="text-2xl font-semibold mb-6 text-center">Cadastro</h2>
 
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Label</label>
-                    <x-input-tw type="number" name="order_no" :value="isset($menu) ? $menu->order_no : null" placeholder="-- Nenhum --"
-                        title="Ordem em que vai aparecer no menu" required />
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Label</label>
+                        <x-input-tw type="number" name="order_no" :value="old('nome', isset($menu) ? Str::upper($menu->nome) : null)" placeholder="-- Nenhum --"
+                            title="Nome do menu" required />
+                        <x-input-error class="mt-2" :messages="$errors->get('nome')" />
+                    </div>
+
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Label</label>
+                        <x-select-input :options="$sexoOptions" :selected="isset($menu) ? $menu->sexo_id : null" class="text-dark" required name="sexo_id"
+                            :selected="old('sexo_id', isset($menu) ? $menu->sexo_id : null)" autofocus autocomplete="menu" required />
+                        <x-input-error class="mt-2" :messages="$errors->get('sexo_id')" />
+                    </div>
+
                     <div class="flex gap-2 pt-4">
                         <!-- Botão de voltar -->
                         <a href="#">

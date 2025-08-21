@@ -9,7 +9,6 @@
         {{-- <i class="ti ti-shopping-bag text-xl text-4xl"></i> --}}
         {{-- <i class="ti ti-chart-arrows text-xl text-4xl"></i> --}}
         {{-- <i class="ti ti-chart-arcs text-xl text-4xl"></i> --}}
-        {{-- <i class="ti text-5xl text-black"></i> --}}
 
         <div
             class="flex gap-6 p-6 mt-6 bg-white shadow-md rounded-xl card grid grid-cols-1 lg:grid-cols-3 lg:gap-x-6 gap-x-0 lg:gap-y-0 gap-y-6">

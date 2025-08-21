@@ -15,7 +15,7 @@
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
 
-                        <div class="mb-4">
+                        {{-- <div class="mb-4">
                             <label for="email" class="block text-gray-600 text-sm font-medium mb-1">
                                 {{ __('Email Address') }}
                             </label>
@@ -26,13 +26,26 @@
                             @error('email')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
+                        </div> --}}
+
+                        <div class="mb-4">
+                            <label for="cpf" class="block text-gray-600 text-sm font-medium mb-1">
+                                {{ __('Número do CPF') }} <span class="text-red-800">*</span>
+                            </label>
+                            <input id="cpf" type="number" name="cpf" value="{{ old('cpf') }}" required
+                                autofocus title="Somente números"
+                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('cpf') border-red-500 @enderror">
+
+                            @error('cpf')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="mb-4">
                             <label for="password" class="block text-gray-600 text-sm font-medium mb-1">
                                 {{ __('Password') }}
                             </label>
-                            <input id="password" type="password" name="password" required
+                            <input id="password" type="password" name="password" required title="No mínimo 8 caracteres"
                                 class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('password') border-red-500 @enderror">
 
                             @error('password')

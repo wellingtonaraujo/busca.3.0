@@ -44,13 +44,15 @@
 
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
-                        <x-input-tw type="text" name="name" :value="isset($acl) ? $acl->name : null" placeholder="nome ou nomeSobrenome"
+                        <x-input-tw type="text" name="name" :value="old('nome', isset($acl) ? Str::upper($acl->name) : null)" placeholder="nome ou nomeSobrenome"
                             title="Nome da acl - ex: teste ou testeTeste" required />
+                        <x-input-error class="mt-2" :messages="$errors->get('name')" />
                     </div>
                     <div>
                         <label for="descricao" class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
-                        <x-input-tw type="text" name="descricao" :value="isset($acl) ? $acl->descricao : null" placeholder="-- Nenhum --"
+                        <x-input-tw type="text" name="descricao" :value="old('descricao', isset($acl) ? $acl->descricao : null)" placeholder="-- Nenhum --"
                             title="Descrição da acl" required />
+                        <x-input-error class="mt-2" :messages="$errors->get('descricao')" />
                     </div>
 
                     <div class="flex gap-2 pt-4">

@@ -18,8 +18,9 @@ class DatabaseSeeder extends Seeder
             MenuSeeder::class,
             RouteMetodoSeeder::class,
             RouteSeeder::class,
-            ProfileRouteSeeder::class,
-            UserSeeder::class,
+            EntidadeSeeder::class,
+            // ProfileRouteSeeder::class,
+            PessoaSeeder::class,
         ]);
     }
 }

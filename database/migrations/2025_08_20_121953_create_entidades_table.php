@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('profiles', function (Blueprint $table) {
+        Schema::create('entidades', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100)->unique()->comment('nome do perfil');
-            $table->text('descricao')->nullable()->comment('descrição do perfil');
-            $table->integer('entidade_id')->unsigned();
-            $table->integer('expira')->nullable();
+            $table->string('nome')->unique();
+            $table->string('sigla')->unique();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('profiles');
+        Schema::dropIfExists('entidades');
     }
 };

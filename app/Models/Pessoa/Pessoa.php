@@ -18,6 +18,7 @@ class Pessoa extends Model
         'entidade_id',
         'matricula',
         'nascimento',
+        'sexo_id',
         'cep',
         'logradouro',
         'numero',

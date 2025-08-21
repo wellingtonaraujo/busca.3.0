@@ -46,9 +46,11 @@
                                     <td class="px-4 py-2 flex items-center space-x-2">@include('modelo.action')</td>
                                 </tr>
                             @endforeach
-
                         </tbody>
                     </table>
+                    <div class="mt-4 flex justify-center">
+                        {{ $acls->links() }}
+                    </div>
                 </div>
             </div>
         </div>

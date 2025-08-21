@@ -54,12 +54,22 @@ class MenuSeeder extends Seeder
         ]);
 
         // Submenus de Administração
+        $pessoas = Menu::create([
+            'name' => 'Pessoas',
+            'icon' => 'ti ti-shield',
+            'route' => '/pessoa',
+            'parent_id' => $administracao->id,
+            'order_no' => 2,
+            'is_active' => true,
+        ]);
+
+        // Submenus de Administração
         $usuarios = Menu::create([
             'name' => 'Usuários',
             'icon' => 'ti ti-users',
             'route' => '/users',
             'parent_id' => $administracao->id,
-            'order_no' => 2,
+            'order_no' => 3,
             'is_active' => true,
         ]);
 
@@ -68,7 +78,7 @@ class MenuSeeder extends Seeder
             'icon' => 'ti ti-id',
             'route' => '/profile',
             'parent_id' => $administracao->id,
-            'order_no' => 2,
+            'order_no' => 4,
             'is_active' => true,
         ]);
 
@@ -78,6 +88,7 @@ class MenuSeeder extends Seeder
         $profile->menus()->attach([
             $administracao->id,
             $menus->id,
+            $pessoas->id,
             $usuarios->id,
             $perfis->id
         ]);

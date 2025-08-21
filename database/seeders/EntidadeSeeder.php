@@ -14,18 +14,23 @@ class EntidadeSeeder extends Seeder
      */
     public function run(): void
     {
+        // limpar a tabela
+        $truncated = Entidade::truncate();
+
         //migrar orgao_publicos do banco antigo para entidades do banco novo
         $orgaoPublico = DB::connection('siapenbusca')->table("orgao_publicos")->get();
         foreach ($orgaoPublico as $orgao) {
+            $nome =  $orgao->descricao == "Secretaria de Estado de Justiça e Segurança Public" ? "SECRETARIA DE ESTADO DE JUSTIçA E SEGURANçA PÚBLICA" : strtoupper($orgao->descricao);
             $dados = [
-                'nome' => $orgao->descricao,
+                'nome' => $nome,
                 'sigla' => $orgao->sigla,
             ];
 
-            $existeEntidade = Entidade::where($dados)->get();
+            $existeEntidade = Entidade::where('nome',$dados['nome'])->first();
 
             if(is_null($existeEntidade)){
-                $created = Entidade::create($dados);
+                $existeEntidade = Entidade::where('sigla',$dados['sigla'])->first();
+                if(is_null($existeEntidade)) $created = Entidade::create($dados);
             }
         }
     }

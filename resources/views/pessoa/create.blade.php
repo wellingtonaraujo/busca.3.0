@@ -55,10 +55,17 @@
                     {{-- Coluna do formulário --}}
                     <div class="col-span-2 space-y-4">
                         <h2 class="text-2xl font-semibold mb-6 text-center">Cadastro</h2>
+                        <div>
+                            <label for="nome" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                            <x-input-tw type="text" name="nome" :value="old('nome', isset($pessoa) ? Str::upper($pessoa->nome) : null)"
+                                placeholder="João dos Santos Filho" title="Nome da pessoa - ex: Fulano de Tal"
+                                required />
+                            <x-input-error class="mt-2" :messages="$errors->get('name')" />
+                        </div>
 
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
-                            <x-input-tw type="text" name="name" :value="old('nome', isset($pessoa) ? Str::upper($pessoa->name) : null)"
+                            <label for="nome" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                            <x-input-tw type="text" name="nome" :value="old('nome', isset($pessoa) ? Str::upper($pessoa->nome) : null)"
                                 placeholder="João dos Santos Filho" title="Nome da pessoa - ex: Fulano de Tal"
                                 required />
                             <x-input-error class="mt-2" :messages="$errors->get('name')" />

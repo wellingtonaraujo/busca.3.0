@@ -17,7 +17,7 @@ class PessoaSeeder extends Seeder
     {
         //Migrar todos os usuários de user do banco antigo e dividi-los entre as tabelas pessoa e user do novo banco
         // carrega users do banco antigo
-        $userOlds = DB::connection('siapenbusca')->table('users')->get();
+        $userOlds = DB::connection('siapenbusca')->table('users')->orderBy('id')->get();
 
         $contador = 0;
 
@@ -41,9 +41,9 @@ class PessoaSeeder extends Seeder
             $profile = DB::connection('siapenbusca')->table('user_profiles')->where('user_id', $userOld->id)->first();
 
             $user = [
-                'profile_id'        => $profile->id,
+                'profile_id'        => $profile->profile_id,
                 'user_status_id'    => $userOld->id == 1 ? 1 : 2,
-                'entidade_atual_id' => $userOld->orgao_publico_id,
+                'entidade_atual_id' => $userOld->orgao_publico_id == 9 ? 2 : $userOld->orgao_publico_id,
                 'pessoa_id'         => $createdPessoa->id,
                 'cpf'               => $userOld->cpf,
                 'departamento'      => $userOld->departamento,

@@ -72,6 +72,36 @@ return [
 
     'timezone' => 'UTC',
 
+    /**
+     * pagination_showing: Representa o início da frase que indica quais itens estão sendo exibidos.
+     * Exemplo: “Mostrando de 1 a 10 de 150 resultados”.
+     * Normalmente aparece no começo: "Mostrando".
+     */
+
+    'pagination_showing' => 'Mostrando',
+
+    /**
+     * pagination_to: indica o intervalo final da listagem atual.
+     * Exemplo: “Mostrando de 1 a 10 de 150 resultados”.
+     * Usado como a palavra "a" entre os números.
+     */
+
+    'pagination_to' => 'a',
+
+    /**
+     * pagination_of: Representa a parte da frase que indica o total de registros.
+     * Exemplo: “Mostrando de 1 a 10 de 150 resultados”.
+     * Usado como "de".
+     */
+
+    /**
+     * pagination_results: É o complemento da frase, normalmente usado para indicar que os números se referem a registros/resultados.
+     * Exemplo: “Mostrando de 1 a 10 de 150 resultados”.
+     * Usado como "resultados" ou "registros", dependendo do contexto da aplicação.
+    */
+
+    'pagination_results' => 'Registros',
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
@@ -84,6 +114,12 @@ return [
     */
 
     'locale' => 'pt_BR',
+
+    /*
+    | Estas
+    |
+    |
+    */
 
     /*
     |--------------------------------------------------------------------------

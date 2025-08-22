@@ -28,17 +28,17 @@
 
         <div>
             <p class="text-sm text-gray-700 leading-5">
-                {!! __('Mostrando') !!}
+               {{ config('app.pagination_showing') }}
                 @if ($paginator->firstItem())
                     <span class="font-medium">{{ $paginator->firstItem() }}</span>
-                    {!! __('a') !!}
+                    {{ config('app.pagination_to') }}
                     <span class="font-medium">{{ $paginator->lastItem() }}</span>
                 @else
                     {{ $paginator->count() }}
                 @endif
-                {!! __('de') !!}
+                {{ config('app.pagination_of') }}
                 <span class="font-medium">{{ $paginator->total() }}</span>
-                {!! __('Registros ') !!}
+                {{ config('app.pagination_results') }}
             </p>
         </div>
 

@@ -28,13 +28,13 @@
                         <!-- Nome do usuário (botão que ativa o dropdown) -->
                         <h4 @click="open = !open"
                             class="cursor-pointer text-sm font-normal text-white uppercase font-semibold bg-[linear-gradient(90deg,_#FFFFFF_0%,_#8D70F8_100%)] [-webkit-background-clip:text] [background-clip:text] [-webkit-text-fill-color:transparent]">
-                            [{{ Auth::user()->name }}]
+                            [{{ Auth::user()->pessoa->nome }}]
                         </h4>
 
                         <!-- Dropdown (inicialmente oculto) -->
                         <ul x-cloak x-show="open" @click.away="open = false" x-transition
                             class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-50 text-sm text-gray-700">
-                            <li class="px-4 py-2 hover:bg-gray-100">Email: {{ Auth::user()->email }}</li>
+                            <li class="px-4 py-2 hover:bg-gray-100">Email: {{ Auth::user()->cpf }}</li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf

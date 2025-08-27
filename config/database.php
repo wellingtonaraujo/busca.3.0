@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Str;
+$username = 'userdb';
+$passwd = 'spnwbi@siapenweb_bi#db4Fxt%N]lIJuh]AB5$&@-';
 
 return [
 

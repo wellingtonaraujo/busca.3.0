@@ -11,23 +11,23 @@
             ->orderBy('order_no')
             ->get();
     @endphp
-    <aside class="bg-white shadow-md w-[300px] hidden lg:block rounded-xl" id="main-menu">
+    <aside class="bg-gray-800 shadow-md w-[300px] hidden lg:block rounded-xl" id="main-menu">
         <div class="p-4">
             <a href="#" class="flex flex-row items-center">
                 <img src="{{ asset('assets/images/logos/app_logo.svg') }}" width="20" alt="Logo-Dark" />
-                <p class="text-black ms-3">[Título da app][MENU]</p>
+                <p class="text-white ms-3">[Título da app][MENU]</p>
             </a>
         </div>
         <div>
             <nav class="w-full flex flex-col sidebar-nav px-4 mt-5">
-                <ul id="sidebarnav" class="text-gray-600 text-sm">
+                <ul id="sidebarnav" class="text-gray-100 text-sm">
                     @foreach ($menus as $menu)
                         <li class="sidebar-item">
                             @php $hasChildren = $menu->children->count() > 0; @endphp
 
                             @if ($hasChildren)
                                 <button type="button"
-                                    class="flex items-center justify-between text-base py-2.5 my-1 w-full rounded-md hover:bg-gray-100 transition"
+                                    class="flex items-center justify-between text-base py-2.5 my-1 w-full rounded-md hover:bg-gray-700 transition"
                                     onclick="toggleSubmenu(this)">
                                     <div class="flex items-center gap-2">
                                         <i class="{{ $menu->icon }} text-2xl"></i>
@@ -41,7 +41,7 @@
                                         @if ($child->existeProfileMenu($child->id))
                                             <li class="sidebar-item">
                                                 <a href="{{ $child->route }}"
-                                                    class="block text-sm py-1 px-2 text-gray-600 hover:text-blue-600">
+                                                    class="block text-sm py-1 px-2 text-gray-100 hover:text-cyan-400">
                                                     <i class="{{ $child->icon }} text-sm mr-1"></i> {{ $child->name }}
                                                 </a>
                                             </li>

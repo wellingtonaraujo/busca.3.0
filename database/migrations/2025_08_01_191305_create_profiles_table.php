@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('name', 100)->unique()->comment('nome do perfil');
             $table->text('descricao')->nullable()->comment('descrição do perfil');
             $table->integer('entidade_id')->unsigned();
-            $table->integer('expira')->nullable();
+            $table->integer('expiracao_adm')->nullable();
+            $table->integer('expiracao_user')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

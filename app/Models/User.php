@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Models\Adm\ProfileRoute;
 use App\Models\Adm\Route;
 use App\Models\Adm\UserStatus;
+use App\Models\Pessoa\Pessoa;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -90,5 +91,9 @@ class User extends Authenticatable
         $existsPermission = ProfileRoute::where('profile_id', Auth::user()->profile_id)->where('route_id', $modelRoute->id)->first();
 
         return !is_null($existsPermission) ? true : false;
+    }
+
+    public function pessoa(){
+        return $this->hasOne(Pessoa::class, 'id', 'pessoa_id');
     }
 }

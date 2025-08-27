@@ -14,20 +14,15 @@ class ProfileSeeder extends Seeder
      */
     public function run(): void
     {
-        //semear profiles
-        // $perfil = [
-        //     'name'      => 'Administrador',
-        //     'descricao' => 'Administrador geral do sistema',
-        // ];
-
         $profileOld = DB::connection('siapenbusca')->table('profiles')->whereNotNull('orgao_publico_id')->get();
 
         foreach ($profileOld as $item) {
             $dados = [
-                'name'        => $item->name,
-                'descricao'   => null,
-                'entidade_id' => $item->orgao_publico_id,
-                'expira'      => $item->numero_dias_expiracao,
+                'name'           => $item->name,
+                'descricao'      => null,
+                'entidade_id'    => $item->orgao_publico_id,
+                'expiracao_adm'  => $item->numero_dias_expiracao,
+                'expiracao_user' => 30
             ];
             $created = Profile::create($dados);
         }

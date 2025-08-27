@@ -16,7 +16,7 @@
             </div>
 
             <div class="flex items-center gap-1">
-                <x-content-header-buttons route="menu.create" icon="ti ti-plus" bgCollor='bg-green-500' hoverBgCollor='hover:bg-green-600' textCollor="text-white" title="Criar um novo menu" />
+                <x-content-header-buttons route="pessoa.create" icon="ti ti-plus" bgCollor='bg-green-500' hoverBgCollor='hover:bg-green-600' textCollor="text-white" title="Criar um novo menu" />
             </div>
         </header>
 

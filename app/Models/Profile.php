@@ -16,7 +16,8 @@ class Profile extends Model
         'name',
         'descricao',
         'entidade_id',
-        'expira',
+        'expiracao_adm',
+        'expiracao_user',
     ];
 
     /**

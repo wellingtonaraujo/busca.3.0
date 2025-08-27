@@ -20,7 +20,7 @@
     <title>{{ config('app.name') }}</title>
 </head>
 
-<body class="bg-gray-200">
+<body class="bg-gray-900 text-gray-100">
     {{-- Incluindo a barra de topo --}}
     <x-layouts.top_bar />
 
@@ -33,7 +33,6 @@
             @include('sweetalert::alert')
             {{ $slot }}
         </div>
-
     </div>
 
     {{-- carregamento de scripts --}}

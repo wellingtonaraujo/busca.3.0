@@ -1,13 +1,13 @@
 <x-layouts.auth_layout>
     <div class="">
-        <header class="bg-white shadow-md rounded-xl w-full text-sm py-4 px-6">
-            [TÍTULO DA PAGINA]
+        <header class="bg-indigo-200 text-indigo-900 shadow-md rounded-xl w-full text-sm py-4 px-6">
+            <strong>[TÍTULO DA PAGINA]</strong>
         </header>
 
-        <i class="ti ti-users text-5xl"></i>
+        {{-- <i class="ti ti-users text-5xl"></i> --}}
 
         <div
-            class="flex gap-6 p-6 mt-6 bg-white shadow-md rounded-xl card grid grid-cols-1 lg:grid-cols-3 lg:gap-x-6 gap-x-0 lg:gap-y-0 gap-y-6">
+            class="flex gap-6 p-6 mt-6 bg-gray-200 shadow-md rounded-xl card grid grid-cols-1 lg:grid-cols-3 lg:gap-x-6 gap-x-0 lg:gap-y-0 gap-y-6">
             <x-alert type="warning" title="Atenção!" message="Mensagem padrão" />
             <x-alert type="danger" title="Erro!" message="Mensagem padrão" />
             <x-alert type="success" title="Sucesso!" message="Mensagem padrão" />
@@ -18,7 +18,7 @@
             <x-alert type="info" title="Informação" message="Mensagem padrão" />
         </div>
         <div
-            class="flex gap-6 p-6 mt-6 bg-white shadow-md rounded-xl card grid grid-cols-1 lg:grid-cols-4 lg:gap-x-6 gap-x-0 lg:gap-y-0 gap-y-6">
+            class="flex gap-6 p-6 mt-6 bg-gray-200 shadow-md rounded-xl card grid grid-cols-1 lg:grid-cols-4 lg:gap-x-6 gap-x-0 lg:gap-y-0 gap-y-6">
             <x-stat-card title="TITLE" number="321,15" percent="15,00%" description="Descrição dos dados"
                 icon="ti ti-chart-pie text-white text-3xl" iconBg="bg-red-500" iconBorderColor="border-red-200" />
 
@@ -33,7 +33,7 @@
         </div>
 
         <div
-            class="flex gap-6 p-6 mt-6 bg-white shadow-md rounded-xl card grid grid-cols-1 lg:grid-cols-3 lg:gap-x-6 gap-x-0 lg:gap-y-0 gap-y-6">
+            class="flex gap-6 p-6 mt-6 bg-gray-200 shadow-md rounded-xl card grid grid-cols-1 lg:grid-cols-3 lg:gap-x-6 gap-x-0 lg:gap-y-0 gap-y-6">
             <x-chart-card title="BAR" subtitle="Gráfico tipo barra" icon="ti ti-car" iconBg="bg-amber-700"
                 bgColor="bg-amber-400" lgColor="text-amber-900" txColor="text-amber-800" chart-type="bar"
                 :chart-data="[12, 19, 7, 15, 10, 20, 25]" :chart-labels="['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']" :chart-color="[
@@ -71,7 +71,7 @@
                 ]" />
         </div>
         <div
-            class="flex gap-6 p-6 mt-6 bg-white shadow-md rounded-xl card grid grid-cols-1 lg:grid-cols-3 lg:gap-x-6 gap-x-0 lg:gap-y-0 gap-y-6">
+            class="flex gap-6 p-6 mt-6 bg-gray-200 shadow-md rounded-xl card grid grid-cols-1 lg:grid-cols-3 lg:gap-x-6 gap-x-0 lg:gap-y-0 gap-y-6">
             <x-chart-card title="POLARAREA" subtitle="Grafico tipo área polar" icon="ti ti-shopping-bag"
                 iconBg="bg-lime-700" bgColor="bg-lime-200" lgColor="text-lime-900" txColor="text-lime-800"
                 chart-type="polarArea" :chart-data="[12, 19, 7, 15, 10, 20, 25]" :chart-labels="['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom']" :chart-color="[

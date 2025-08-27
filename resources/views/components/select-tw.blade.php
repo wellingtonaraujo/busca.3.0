@@ -2,7 +2,7 @@
     <select
         name="{{ $name }}"
         id="{{ $id }}"
-        class="{{ inputClass() }}" {{ $attributes }}
+        class="border-1 border-gray-600 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-md px-2 py-1 {{ inputClass() }}" {{ $attributes }}
         title="{{ $title }}"
         {{ $attributes->merge(['required' => $required]) }}>
         @if ($placeholder)

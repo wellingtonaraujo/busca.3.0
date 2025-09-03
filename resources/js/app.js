@@ -45,7 +45,19 @@ document.addEventListener('DOMContentLoaded', () => {
             language: {
                 url: '/lang/pt_BR.json',
                 search: "Buscar:",
-                searchPlaceholder: "Digite aqui para pesquisar..."
+                searchPlaceholder: "Digite aqui para pesquisar...",
+                lengthMenu: "Mostrar _MENU_ registros por página",
+                zeroRecords: "Nenhum registro encontrado",
+                info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                infoEmpty: "Mostrando 0 a 0 de 0 registros",
+                infoFiltered: "(filtrado de _MAX_ registros no total)",
+                search: "Pesquisar:",
+                paginate: {
+                    first: "Primeiro",
+                    last: "Último",
+                    next: "Próximo",
+                    previous: "Anterior"
+                },
             },
 
             dom: '<"flex justify-between items-center text-gray-900 flex-wrap gap-2 mb-3"l f>' +

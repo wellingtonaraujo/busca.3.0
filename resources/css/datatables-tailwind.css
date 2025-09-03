@@ -1,0 +1,25 @@
+/* datatables-tailwind.css */
+
+.dt-row {
+  @apply flex flex-wrap mb-3;
+}
+
+.dt-col-left {
+  @apply flex items-center text-gray-700 text-sm;
+}
+
+.dt-col-right {
+  @apply flex justify-end text-gray-900 text-sm;
+}
+
+.dt-footer-left {
+  @apply flex items-center text-gray-600 text-sm;
+}
+
+.dt-footer-right {
+  @apply flex justify-end;
+}
+
+.dt-main-row {
+  @apply w-full;
+}

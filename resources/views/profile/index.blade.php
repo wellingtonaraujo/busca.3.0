@@ -59,10 +59,6 @@
                         </tbody>
                     </table>
                 </div>
-
-                {{-- <div class="mt-2 flex justify-center">
-                    {{ $profiles->links('pagination::tailwind') }}
-                </div> --}}
             </div>
         </div>
     </div>

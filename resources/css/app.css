@@ -8,3 +8,12 @@
 .select2-container .select2-results__option {
     @apply text-black;
 }
+
+/* ---- Forçar texto preto no DataTables ---- */
+table.dataTable td,
+table.dataTable th,
+table.dataTable td::before {
+    color: #000 !important;
+}
+
+@import './datatables-tailwind.css';

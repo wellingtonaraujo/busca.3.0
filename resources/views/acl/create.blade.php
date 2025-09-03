@@ -1,6 +1,6 @@
 <x-layouts.auth_layout>
     <div class="">
-        <header class="bg-white shadow-md rounded-xl w-full text-sm py-4 px-6 flex justify-between items-center">
+        <header class="bg-yellow-500 text-black shadow-md rounded-xl w-full text-sm py-4 px-6">
             <div class="flex items-center space-x-2 text-2xl">
                 <a href="{{ route('home') }}">
                     <button
@@ -26,7 +26,7 @@
                 <button class="bg-sky-500 text-white text-2xl px-2 py-1 rounded-l hover:bg-sky-600 flex items-center">
                     <i class="ti ti-plus"></i>
                 </button>
-                <span>[ADMIN - PROFILE - ACL - {{ isset($acl) ? 'EDIT' : 'NOVO' }}]</span>
+                <span><strong>[ADMIN - PROFILE - ACL - {{ isset($acl) ? 'EDIT' : 'NOVO' }}]</strong></span>
             </div>
         </header>
 

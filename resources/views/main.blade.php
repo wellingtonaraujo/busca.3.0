@@ -1,6 +1,6 @@
 <x-layouts.auth_layout>
     <div class="">
-        <header class="bg-indigo-200 text-indigo-900 shadow-md rounded-xl w-full text-sm py-4 px-6">
+        <header class="bg-yellow-700 text-yellow-100 shadow-md rounded-xl w-full text-sm py-4 px-6">
             <strong>[TÍTULO DA PAGINA]</strong>
         </header>
 

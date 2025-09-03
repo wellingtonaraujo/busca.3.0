@@ -1,33 +1,19 @@
 <x-layouts.auth_layout>
-    {{-- @include('sweetalert::alert') --}}
     <div class="">
-        <header class="bg-yellow-500 text-black shadow-md rounded-xl w-full text-sm py-4 px-6">
-            <div class="flex items-center space-x-2 text-2xl">
-                <a href="{{ route('home') }}">
-                    <button
-                        class="bg-slate-400 text-white text-2xl px-2 py-1 rounded-l hover:bg-slate-600 flex items-center"
-                        title="Voltar para home">
-                        <i class="ti ti-home"></i>
-                    </button>
-                </a>
-                <a href="{{ route('profile.index') }}">
-                    <button
-                        class="bg-slate-400 text-white text-2xl px-2 py-1 rounded-l hover:bg-slate-600 flex items-center"
-                        title="Voltar para perfil do usuário">
-                        <i class="ti ti-id"></i>
-                    </button>
-                </a>
-                <button class="bg-purple-500 text-white text-2xl px-2 py-1 rounded-l hover:bg-purple-600 flex items-center">
-                    <i class="ti ti-key"></i>
-                </button>
-                <span><strong>[ADMIN - PERFIL - ACL]</strong></span>
-            </div>
 
-            <div class="flex items-center gap-1">
-                {{-- <x-content-header-buttons :route="route('acl.create')" icon="ti ti-plus" bgCollor='bg-green-500'
-                    hoverBgCollor='hover:bg-green-600' textCollor="text-white" title="Criar uma nova acl" /> --}}
-            </div>
-        </header>
+        <x-page-header title="Controle de Acesso" :breadcrumbs="[
+            ['label' => 'Home', 'link' => route('home'), 'icon' => 'ti ti-home'],
+            ['label' => 'Admin', 'icon' => 'ti ti-settings'],
+            ['label' => 'Perfil', 'link' => route('profile.index'), 'icon' => 'ti ti-id']]"
+            :buttons="[
+            [
+                'icon' => 'ti ti-plus',
+                'bg' => 'bg-black',
+                'text' => 'text-yellow-200',
+                'hover' => 'bg-yellow-600',
+                'title' => 'Novo registro',
+            ],
+        ]" />
 
         <div class="flex gap-6 p-6 mt-6 bg-gray-200 shadow-md rounded-xl card">
             <div class="body w-full">

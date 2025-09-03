@@ -12,10 +12,10 @@
             ->get();
     @endphp
     <aside class="bg-gray-800 shadow-md w-[300px] hidden lg:block rounded-xl" id="main-menu">
-        <div class="p-4">
+        <div class="bg-yellow-700 p-4 rounded-xl">
             <a href="#" class="flex flex-row items-center">
-                <img src="{{ asset('assets/images/logos/app_logo.svg') }}" width="20" alt="Logo-Dark" />
-                <p class="text-white ms-3">[Título da app][MENU]</p>
+                <img src="{{ asset('assets/images/logos/carceris-white.svg') }}" width="20" alt="Logo-Dark" />
+                <p class="text-white ms-3">Menu de Opções</p>
             </a>
         </div>
         <div>

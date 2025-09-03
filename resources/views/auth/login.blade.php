@@ -1,7 +1,7 @@
 <x-layouts.auth_login_layout>
     <div class="">
         <div class="flex items-center justify-center h-screen w-screen bg-gray-900">
-            <div class="p-6 bg-cyan-600 shadow-lg rounded-lg">
+            <div class="p-6 bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-800 shadow-lg rounded-lg">
                 <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-semibold text-center mb-6 text-gray-700">
                         <div class="flex items-center justify-center gap-2">
@@ -13,19 +13,6 @@
 
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
-
-                        {{-- <div class="mb-4">
-                            <label for="email" class="block text-gray-600 text-sm font-medium mb-1">
-                                {{ __('Email Address') }}
-                            </label>
-                            <input id="email" type="email" name="email" value="{{ old('email') }}" required
-                                autofocus
-                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('email') border-red-500 @enderror">
-
-                            @error('email')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                            @enderror
-                        </div> --}}
 
                         <div class="mb-4">
                             <label for="cpf" class="block text-gray-600 text-sm font-medium mb-1">

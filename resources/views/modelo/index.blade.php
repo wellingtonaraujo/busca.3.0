@@ -33,7 +33,7 @@
             <div class="body w-full">
                 <!-- Tabela Flex -->
                 <div class="w-full overflow-x-auto">
-                    <table class="min-w-[600px] w-full text-sm text-left border-collapse">
+                    <table class="min-w-[600px] w-full text-sm text-left border-collapse datatables">
                         <thead class="bg-gray-100 border-b border-gray-300">
                             <tr>
                                 <th class="px-4 py-2 font-semibold">Nome</th>
@@ -48,9 +48,6 @@
                             @endforeach
                         </tbody>
                     </table>
-                    <div class="mt-4 flex justify-center">
-                        {{ $itens->links('pagination::tailwind') }}
-                    </div>
                 </div>
             </div>
         </div>

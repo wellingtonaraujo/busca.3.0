@@ -1,0 +1,25 @@
+/* Campo de busca dentro do dropdown */
+.select2-container .select2-search__field {
+    color: black !important; /* texto preto */
+}
+
+/* Opções do dropdown */
+.select2-container .select2-results__option {
+    color: black !important; /* texto preto */
+}
+
+/* Opcional: placeholder do campo de busca */
+.select2-container .select2-selection__placeholder {
+    color: #999 !important;
+}
+
+/* Opcional: manter o highlight azul com texto branco */
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: #5897fb;
+    color: white !important;
+}
+
+.select2-container--classic .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: #3875d7;
+    color: white !important;
+}

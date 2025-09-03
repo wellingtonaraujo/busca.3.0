@@ -2,24 +2,41 @@
 import jQuery from 'jquery';
 window.$ = window.jQuery = jQuery;
 
-// Importa DataTables com Bootstrap 5
+// -------------------------
+// DataTables (Bootstrap 5)
+// -------------------------
 import 'datatables.net-bs5';
 import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css';
 
-// Importa DataTables Responsive com Bootstrap 5
+// DataTables Responsive (Bootstrap 5)
 import 'datatables.net-responsive-bs5';
 import 'datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css';
 
-// Importa Select2 e seu CSS
-import 'select2';
+// -------------------------
+// Select2 (com tema Bootstrap 5)
+// -------------------------
+import 'select2/dist/js/select2.js';
 import 'select2/dist/css/select2.css';
 
-// Inicialização após o DOM carregar
-document.addEventListener('DOMContentLoaded', () => {
-    const tables = document.querySelectorAll('.datatables');
+console.log('CSS select2-bootstrap carregado');
 
-    tables.forEach(table => {
-        $(table).DataTable({
+// -------------------------
+// Inicialização
+// -------------------------
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Função para aplicar os estilos Tailwind
+    function styleDataTableElements(dtInstance) {
+        // dtInstance é a instância do DataTable (objeto retornado por $(table).DataTable())
+        const wrapper = $(dtInstance.table().container());
+        wrapper.find('select').addClass('border border-gray-600 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-md px-2 py-1');
+        wrapper.find('input[type="search"]').addClass('border border-gray-600 focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 rounded-md px-2 py-1');
+    }
+
+    // Inicializa DataTables
+    const tables = document.querySelectorAll('.datatables');
+    tables.forEach(tableEl => {
+        const dt = $(tableEl).DataTable({
             autoWidth: true,
             responsive: true,
             paging: true,
@@ -30,8 +47,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 search: "Buscar:",
                 searchPlaceholder: "Digite aqui para pesquisar..."
             },
-            // Note que estamos adicionando 'f' para busca e 'p' para paginação
-            dom: '<"flex justify-between items-center p-2 text-black"fl><"p-2 text-black"rt><"flex justify-between items-center p-2 text-black"ip>'
+
+            dom: '<"flex justify-between items-center text-gray-900 flex-wrap gap-2 mb-3"l f>' +
+                '<"w-full"tr>' +
+                '<"flex justify-between items-center flex-wrap gap-2 mt-3"i p>',
+
+
+            initComplete: function () {
+                // "this" aqui é o elemento HTML da tabela, então pegamos a instância DataTable
+                styleDataTableElements($(this).DataTable());
+            }
+        });
+
+        // Aplica sempre após redraw (para responsivo/paginação)
+        dt.on('draw.dt', function () {
+            styleDataTableElements(dt); // dt já é a instância correta
         });
     });
 });
+
+
+

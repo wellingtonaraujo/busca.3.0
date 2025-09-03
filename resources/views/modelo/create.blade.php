@@ -11,7 +11,7 @@
                 <button class="bg-gray-500 text-white text-2xl px-2 py-1 rounded-l hover:bg-gray-600 flex items-center">
                     <i class="ti ti-plus"></i>
                 </button>
-                <span>[ADMIN - PROFILE - {{ isset($profile) ? 'EDIT' : 'NOVO' }}]</span>
+                <span>[ADMIN - PROFILE - {{ isset($model) ? 'EDIT' : 'NOVO' }}]</span>
             </div>
         </header>
 
@@ -36,10 +36,10 @@
                     </div>
 
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Label</label>
-                        <x-select-input :options="$sexoOptions" :selected="isset($menu) ? $menu->sexo_id : null" class="text-dark" required name="sexo_id"
-                            :selected="old('sexo_id', isset($menu) ? $menu->sexo_id : null)" autofocus autocomplete="menu" required />
-                        <x-input-error class="mt-2" :messages="$errors->get('sexo_id')" />
+                        <label for="label" class="block text-sm font-medium text-gray-700 mb-1">Label</label>
+                        <x-select-tw :options="$model" :selected="isset($model) ? $model->campo_id : null" class="select2 text-dark" required
+                            name="campo_id" :selected="old('campo_id', isset($model) ? $model->campo_id : null)" autocomplete required />
+                        <x-input-error class="mt-2" :messages="$errors->get('campo_id')" />
                     </div>
 
                     <div class="flex gap-2 pt-4">

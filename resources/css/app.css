@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import './select2-bootstrap.css';
+
+.select2-container .select2-search__field,
+.select2-container .select2-results__option {
+    @apply text-black;
+}

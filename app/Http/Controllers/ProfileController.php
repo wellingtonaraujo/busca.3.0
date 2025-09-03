@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Pessoa\Entidade;
 use App\Models\Profile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -23,27 +24,27 @@ class ProfileController extends Controller
 
     public function create()
     {
-        return view('profile.create');
+        return view('profile.create')
+            ->with('entidades', Entidade::orderBy('id')->pluck('nome', 'id'));
     }
 
     public function store(Request $request)
     {
-
         //validação dos dados
         $validated = $request->validate(
             [
-                'name' => ['required', 'string', 'unique:profiles,name'],
-                'descricao' => ['required', 'string'],
+                'name'           => ['required', 'string', 'unique:profiles,name'],
+                'descricao'      => ['required', 'string'],
+                'entidade_id'    => ['required', 'integer'],
+                'expiracao_adm'  => ['required', 'integer'],
+                'expiracao_user' => ['required', 'integer'],
             ]
         );
 
         try {
             DB::beginTransaction();
 
-            $profile = Profile::create([
-                'name' => $validated['name'],
-                'descricao' => $validated['descricao'],
-            ]);
+            $profile = Profile::create($validated);
 
             DB::commit();
 
@@ -60,7 +61,9 @@ class ProfileController extends Controller
     public function edit($id)
     {
         $profile = Profile::find($id);
-        return view('profile.create')->with('profile', $profile);
+        return view('profile.create')
+            ->with('entidades', Entidade::orderBy('id')->pluck('nome', 'id'))
+            ->with('profile', $profile);
     }
 
     public function update(Request $request, Profile $profile)

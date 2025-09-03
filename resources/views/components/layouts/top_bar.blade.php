@@ -1,5 +1,7 @@
 <header>
-    <div class="z-40 sticky top-0 py-[15px] px-6 bg-[linear-gradient(90deg,_#0f0533_0%,_#1b0a5c_100%)] w-full">
+    <div class="z-40 sticky top-0 py-[15px] px-6
+        bg-gradient-to-r from-zinc-900 via-gray-800 via-gray-600 to-gray-900
+        border border-gray-700 w-full">
         <div class="flex items-center gap-4 w-full">
             <!-- Menu e Logo (lado esquerdo) -->
             <div class="flex items-center gap-4">

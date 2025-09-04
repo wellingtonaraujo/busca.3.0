@@ -6,14 +6,14 @@
             <i class="ti ti-edit text-2xl"></i>
         </a>
     @endif
-{{--
+
     @if (Auth::user()->routeAccess('profileRoute.index'))
         <a href="{{ route('profileRoute.index',  ['profile_id'=>$model->id]) }}"
            class="text-blue-500 hover:text-blue-700 p-2 rounded border border-blue-200"
            title="Rotas permitidas para este usuário...">
             <i class="ti ti-user-shield text-2xl"></i>
         </a>
-    @endif --}}
+    @endif
 
     @if (Auth::user()->routeAccess("$route.destroy"))
         <form action="{{ route('profile.destroy', $model->id) }}" method="POST"

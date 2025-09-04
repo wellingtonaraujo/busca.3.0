@@ -7,22 +7,59 @@ use App\Models\Adm\Acl;
 use App\Models\Adm\Route;
 use App\Models\Adm\RouteMetodo;
 use App\Models\Profile;
+use App\Traits\PageHeaderTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class AclController extends Controller
 {
+    use PageHeaderTrait;
+
+    public function __construct()
+    {
+        $this->initPageHeader();
+
+        $this->breadcrumbs[] = ['label' => 'Admin', 'icon' => 'ti ti-settings'];
+        $this->breadcrumbs[] = ['label' => 'Perfil', 'link' => route('profile.index'), 'icon' => 'ti ti-id'];
+
+        switch (request()->route()->getActionMethod()) {
+            case 'edit':
+                $this->titulo = 'Alterar Controle de Acesso';
+                $this->breadcrumbs[] = ['label' => 'Acl', 'link' => route('acl.index'), 'icon' => 'ti ti-key'];
+                break;
+            case 'create':
+                $this->titulo = 'Novo Controle de Acesso';
+                $this->breadcrumbs[] = ['label' => 'Acl', 'link' => route('acl.index'), 'icon' => 'ti ti-key'];
+                break;
+
+            default:
+                $this->titulo = 'Controle de Acesso';
+                break;
+        }
+
+        // acrescentando botões
+        $this->buttons[] = ['icon' => 'ti ti-plus', 'link' => route('acl.create'),'bg' => 'bg-gray-600', 'text' => 'text-white', 'hover' => 'bg-gray-900', 'title' => 'Novo registro'];
+    }
+
     public function index()
     {
+        // dd($this->breadcrumbs, $this->buttons);
         return view('acl.index')
             ->with('route', 'acl')
-            ->with('acls', Acl::paginate(10));
+            ->with('titulo', $this->titulo)
+            ->with('breadcrumbs', $this->breadcrumbs)
+            ->with('otherButtons', $this->buttons)
+            ->with('acls', Acl::get());
     }
 
     public function create()
     {
-        return view('acl.create');
+        return view('acl.create')
+            ->with('route', 'acl')
+            ->with('titulo', $this->titulo)
+            ->with('breadcrumbs', $this->breadcrumbs)
+            ->with('otherButtons', $this->buttons);
     }
 
     public function store(Request $request)
@@ -71,11 +108,13 @@ class AclController extends Controller
 
     public function edit($id)
     {
-        $profile = Profile::find(request()->profile_id);
         $acl = Acl::find($id);
         return view('acl.create')
-            ->with('acl', $acl)
-            ->with('profile', $profile);
+            ->with('route', 'acl')
+            ->with("acl", $acl)
+            ->with('titulo', $this->titulo)
+            ->with('breadcrumbs', $this->breadcrumbs)
+            ->with('otherButtons', $this->buttons);
     }
 
     public function update(Request $request, Acl $acl)
@@ -104,7 +143,7 @@ class AclController extends Controller
                     $metodo = explode(".", $route->name);
                     $updatedRoute = $route->update(['name' => "$acl->name.$metodo[1]"]);
                 }
-            }else{
+            } else {
                 $metodos = RouteMetodo::all();
                 foreach ($metodos as $metodo) {
                     $createdRoute = Route::create(['name' => "$acl->name.$metodo->name"]);
@@ -131,7 +170,7 @@ class AclController extends Controller
         try {
             DB::beginTransaction();
 
-            $routes = Route::where('name', 'like',"$acl->name.%")->forceDelete();
+            $routes = Route::where('name', 'like', "$acl->name.%")->forceDelete();
 
             // Soft delete (ou hard delete se não usar SoftDeletes)
             $acl->forceDelete();

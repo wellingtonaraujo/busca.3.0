@@ -1,42 +1,16 @@
 <x-layouts.auth_layout>
     <div class="">
-        <header class="bg-yellow-500 text-black shadow-md rounded-xl w-full text-sm py-4 px-6">
-            <div class="flex items-center space-x-2 text-2xl">
-                <a href="{{ route('home') }}">
-                    <button
-                        class="bg-slate-400 text-white text-2xl px-2 py-1 rounded-l hover:bg-slate-600 flex items-center"
-                        title="Voltar para home">
-                        <i class="ti ti-home"></i>
-                    </button>
-                </a>
-                <a href="{{ route('profile.index') }}">
-                    <button
-                        class="bg-slate-400 text-white text-2xl px-2 py-1 rounded-l hover:bg-slate-600 flex items-center"
-                        title="Voltar para perfil do usuário">
-                        <i class="ti ti-id"></i>
-                    </button>
-                </a>
-                <a href="{{ route('acl.index') }}">
-                    <button
-                        class="bg-slate-400 text-white text-2xl px-2 py-1 rounded-l hover:bg-slate-600 flex items-center"
-                        title="Voltar para perfil do usuário">
-                        <i class="ti ti-user-shield"></i>
-                    </button>
-                </a>
-                <button class="bg-sky-500 text-white text-2xl px-2 py-1 rounded-l hover:bg-sky-600 flex items-center">
-                    <i class="ti ti-plus"></i>
-                </button>
-                <span><strong>[ADMIN - PROFILE - ACL - {{ isset($acl) ? 'EDIT' : 'NOVO' }}]</strong></span>
-            </div>
-        </header>
+        @if (isset($titulo))
+            <x-page-header title="{{ $titulo }}" :breadcrumbs="$breadcrumbs" :buttons="$otherButtons" />
+        @endif
 
         <div class="flex gap-6 p-6 mt-6 bg-white shadow-md rounded-xl card">
             <div class="body w-full">
-                <div class="w-full overflow-x-auto">
+                <div class="w-full overflow-x-auto text-black">
                     <span class="text-2xl">Dados da nova ACL</span>
                 </div>
-                <form action="{{ isset($acl) ? route('acl.update', $acl->id) : route('acl.store') }}"
-                    method="POST" class="mt-6 space-y-4">
+                <form action="{{ isset($acl) ? route('acl.update', $acl->id) : route('acl.store') }}" method="POST"
+                    class="mt-6 space-y-4">
                     @csrf
                     @if (!empty($acl))
                         @method('PUT')

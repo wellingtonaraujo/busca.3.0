@@ -1,27 +1,9 @@
 <x-layouts.auth_layout>
     {{-- @include('sweetalert::alert') --}}
     <div class="">
-        <header class="bg-indigo-200 shadow-md rounded-xl w-full text-sm py-4 px-6 flex justify-between items-center">
-            <div class="flex items-center space-x-2 text-2xl">
-                <a href="{{ route('home') }}">
-                    <button
-                        class="bg-slate-400 text-white text-2xl px-2 py-1 rounded-l hover:bg-slate-600 flex items-center">
-                        <i class="ti ti-home"></i>
-                    </button>
-                </a>
-                <button class="bg-sky-500 text-white text-2xl px-2 py-1 rounded-l hover:bg-sky-600 flex items-center">
-                    <i class="ti ti-id"></i>
-                </button>
-                <span class="text-indigo-900">[ADMIN - PERFIL]</span>
-            </div>
-
-            <div class="flex items-center gap-1">
-                <x-content-header-buttons route="acl.index" icon="ti ti-key" bgCollor='bg-purple-400'
-                    hoverBgCollor='hover:bg-purple-500' textCollor="text-white" title="Criar um novo perfil" />
-                <x-content-header-buttons route="profile.create" icon="ti ti-plus" bgCollor='bg-green-500'
-                    hoverBgCollor='hover:bg-green-600' textCollor="text-white" title="Criar um novo perfil" />
-            </div>
-        </header>
+        @if (isset($titulo))
+            <x-page-header title="{{ $titulo }}" :breadcrumbs="$breadcrumbs" :buttons="$otherButtons" />
+        @endif
 
         <div class="flex gap-6 p-6 mt-6 bg-gray-200 shadow-md rounded-xl card">
             <div class="body w-full">

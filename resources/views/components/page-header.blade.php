@@ -52,7 +52,6 @@
                         @endphp
 
                         @if(isset($button['link']))
-                            {{ dd($button['bg']) }}
                             <a href="{{ $button['link'] }}">
                                 <button
                                     class="{{ $button['bg'] }} {{ $button['text'] }} {{ $first }} {{ $middle }} {{ $last }} text-2xl px-2 py-1 hover:{{ $button['hover'] }} flex items-center border border-gray-300 -ml-px first:ml-0"

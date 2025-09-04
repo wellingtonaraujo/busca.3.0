@@ -1,23 +1,12 @@
 <x-layouts.auth_layout>
     <div class="">
-        <header class="bg-indigo-200 shadow-md rounded-xl w-full text-sm py-4 px-6 flex justify-between items-center">
-            <div class="flex items-center space-x-2 text-2xl">
-                <a href="{{ route('home') }}">
-                    <button
-                        class="bg-slate-400 text-white text-2xl px-2 py-1 rounded-l hover:bg-slate-600 flex items-center">
-                        <i class="ti ti-home"></i>
-                    </button>
-                </a>
-                <button class="bg-sky-500 text-white text-2xl px-2 py-1 rounded-l hover:bg-sky-600 flex items-center">
-                    <i class="ti ti-id"></i>
-                </button>
-                <span class="text-indigo-900">[ADMIN - PERFIL] {{ isset($profile) ? 'Editar' : 'Novo' }} </span>
-            </div>
-        </header>
+        @if (isset($titulo))
+            <x-page-header title="{{ $titulo }}" :breadcrumbs="$breadcrumbs" :buttons="$otherButtons" />
+        @endif
 
         <div class="flex gap-6 p-6 mt-6 bg-white shadow-md rounded-xl card">
             <div class="body w-full">
-                <div class="w-full overflow-x-auto">
+                <div class="w-full overflow-x-auto text-black">
                     <span class="text-black text-2xl">Dados do novo perfil</span>
                 </div>
                 <form action="{{ isset($profile) ? route('profile.update', $profile->id) : route('profile.store') }}"

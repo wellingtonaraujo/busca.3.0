@@ -1,9 +1,7 @@
-<div class="flex bg-cyan-300 hover:bg-cyan-400 p-3 mb-4 text-1xl rounded-xl card ">
-    <strong><i class="ti ti-info-circle text-3xl"></i> {{ $profile->name }} <i class="ti ti-arrow-right"></i> {{ $profile->descricao }}.</strong>
-</div>
-<div>
+
+<div class="w-full p-3 text-1xl overflow-x-auto text-black rounded-xl card">
     <input type="checkbox" id="selecionar-todos">
-    <label for="selecionar-todos">Selecionar Todas</label>
+    <label for="selecionar-todos" class="text-black">Selecionar Todas</label>
 </div>
 <form action="{{ route('profileRoute.store') }}" method="POST" class="mt-6 space-y-4">
     @csrf

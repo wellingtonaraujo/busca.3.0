@@ -1,19 +1,9 @@
 <x-layouts.auth_layout>
     <div class="">
 
-        <x-page-header title="Controle de Acesso" :breadcrumbs="[
-            ['label' => 'Home', 'link' => route('home'), 'icon' => 'ti ti-home'],
-            ['label' => 'Admin', 'icon' => 'ti ti-settings'],
-            ['label' => 'Perfil', 'link' => route('profile.index'), 'icon' => 'ti ti-id']]"
-            :buttons="[
-            [
-                'icon' => 'ti ti-plus',
-                'bg' => 'bg-black',
-                'text' => 'text-yellow-200',
-                'hover' => 'bg-yellow-600',
-                'title' => 'Novo registro',
-            ],
-        ]" />
+        @if (isset($titulo))
+            <x-page-header title="{{ $titulo }}" :breadcrumbs="$breadcrumbs" :buttons="$otherButtons" />
+        @endif
 
         <div class="flex gap-6 p-6 mt-6 bg-gray-200 shadow-md rounded-xl card">
             <div class="body w-full">

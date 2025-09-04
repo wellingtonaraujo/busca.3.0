@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Menu;
 use App\Models\ProfileMenu;
 use App\Models\Profile;
+use App\Traits\PageHeaderTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
@@ -12,10 +13,40 @@ use Illuminate\Validation\Rule;
 
 class MenuController extends Controller
 {
+    use PageHeaderTrait;
+
+    public function __construct()
+    {
+        $this->initPageHeader();
+
+        $this->breadcrumbs[] = ['label' => 'Admin', 'icon' => 'ti ti-settings'];
+        // $this->breadcrumbs[] = ['label' => 'Perfil', 'link' => route('profile.index'), 'icon' => 'ti ti-id'];
+
+        switch (request()->route()->getActionMethod()) {
+            case 'edit':
+                $this->titulo = 'Alterar Menu do Sistema';
+                $this->breadcrumbs[] = ['label' => 'Menu', 'link' => route('menu.index'), 'icon' => 'ti ti-key'];
+                break;
+            case 'create':
+                $this->titulo = 'Novo Menu do Sistema';
+                $this->breadcrumbs[] = ['label' => 'Menu', 'link' => route('menu.index'), 'icon' => 'ti ti-key'];
+                break;
+
+            default:
+                $this->titulo = 'Menu do Sistema';
+                break;
+        }
+
+        // acrescentando botões
+        $this->buttons[] = ['icon' => 'ti ti-plus', 'link' => route('menu.create'), 'bg' => 'bg-gray-600', 'text' => 'text-white', 'hover' => 'bg-gray-900', 'title' => 'Novo registro'];
+    }
     public function index()
     {
         return view('menu.index')
             ->with('route', "menu")
+            ->with('titulo', $this->titulo)
+            ->with('breadcrumbs', $this->breadcrumbs)
+            ->with('otherButtons', $this->buttons)
             ->with('menus', Menu::get());
     }
 
@@ -26,7 +57,10 @@ class MenuController extends Controller
         return view('menu.create')
             ->with('parents', Menu::pluck('name', 'id'))
             ->with('menu', null)
-             ->with('parents', Menu::pluck('name', 'id')->toArray())
+            ->with('parents', Menu::pluck('name', 'id')->toArray())
+            ->with('titulo', $this->titulo)
+            ->with('breadcrumbs', $this->breadcrumbs)
+            ->with('otherButtons', $this->buttons)
             ->with('profiles', $Profiles);
     }
 
@@ -81,6 +115,9 @@ class MenuController extends Controller
         return view('menu.create')
             ->with('menu', $menu)
             ->with('profiles', $Profiles)
+            ->with('titulo', $this->titulo)
+            ->with('breadcrumbs', $this->breadcrumbs)
+            ->with('otherButtons', $this->buttons)
             ->with('parents', Menu::pluck('name', 'id')->toArray());
     }
 

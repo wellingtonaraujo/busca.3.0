@@ -1,43 +1,32 @@
 <x-layouts.auth_layout>
     <div class="">
-        <header class="bg-white shadow-md rounded-xl w-full text-sm py-4 px-6 flex justify-between items-center">
-            <div class="flex items-center space-x-2 text-2xl">
-                <a href="{{ route('menu.index') }}">
-                    <button
-                        class="bg-gray-300 text-white text-2xl px-2 py-1 rounded-l hover:bg-gray-400 flex items-center">
-                        <i class="ti ti-menu-2"></i>
-                    </button>
-                </a>
-                <button class="bg-gray-500 text-white text-2xl px-2 py-1 rounded-l hover:bg-gray-600 flex items-center">
-                    <i class="ti ti-plus"></i>
-                </button>
-                <span>[ADMIN - MENU - NOVO]</span>
-            </div>
-        </header>
+        @if (isset($titulo))
+            <x-page-header title="{{ $titulo }}" :breadcrumbs="$breadcrumbs" :buttons="$otherButtons" />
+        @endif
 
         <div class="flex gap-6 p-6 mt-6 bg-white shadow-md rounded-xl card">
             <div class="body w-full">
-                <div class="w-full overflow-x-auto">
+                <div class="w-full overflow-x-auto text-black">
                     <span class="text-2xl">Dados do novo menu</span>
                 </div>
 
-                <form action="{{ !empty($menu) ? route('menu.update', $menu->id) : route('menu.store') }}"
-                    method="POST" class="mt-6 space-y-4">
+                <form action="{{ !empty($menu) ? route('menu.update', $menu->id) : route('menu.store') }}" method="POST"
+                    class="mt-6 space-y-4">
                     @csrf
                     @if (!empty($menu))
                         @method('PUT')
                     @endif
                     <!-- parent_id -->
                     <div>
-                        <label for="parent_id" class="block font-medium">Menu Pai <span
+                        <label for="parent_id" class="block text-sm font-medium text-gray-700 mb-1">Menu Pai <span
                                 class="text-red-500">*</span></label>
-                        <x-select-tw name="parent_id" :options="$parents" :selected="isset($menu) ? $menu->parent_id : null"  placeholder="-- Nenhum --"
+                        <x-select-tw name="parent_id" :options="$parents" :selected="isset($menu) ? $menu->parent_id : null" placeholder="-- Nenhum --"
                             title="Selecione um menu PAI" required />
                     </div>
 
                     <!-- order_no -->
                     <div>
-                        <label for="order_no" class="block font-medium">Ordem do menu <span
+                        <label for="order_no" class="block text-sm font-medium text-gray-700 mb-1">Ordem do menu <span
                                 class="text-red-500">*</span></label>
                         {{-- teste input-tw --}}
                         <x-input-tw type="number" name="order_no" :value="isset($menu) ? $menu->order_no : null" placeholder="-- Nenhum --"
@@ -46,7 +35,7 @@
 
                     <!-- name -->
                     <div>
-                        <label for="name" class="block font-medium">Nome do Menu <span
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nome do Menu <span
                                 class="text-red-500">*</span></label>
                         <x-input-tw type="text" name="name" placeholder="-- Nenhum --"
                             title="Qual será o nome deste menu" required :value="isset($menu) ? $menu->name : null" />
@@ -54,7 +43,7 @@
 
                     <!-- icon -->
                     <div>
-                        <label for="icon" class="block font-medium">Ícone (classe) <span
+                        <label for="icon" class="block text-sm font-medium text-gray-700 mb-1">Ícone (classe) <span
                                 class="text-red-500">*</span></label>
                         <x-input-tw type="text" name="icon" placeholder="ti ti-"
                             title="Icone do menu Ex: ti ti-check" required :value="isset($menu) ? $menu->icon : null" />
@@ -62,22 +51,22 @@
 
                     <!-- route -->
                     <div>
-                        <label for="route" class="block font-medium">Rota</label>
+                        <label for="route" class="block text-sm font-medium text-gray-700 mb-1">Rota</label>
                         <x-input-tw type="text" name="route" placeholder="nome da rota"
                             title="Rota que será invocada ao prescionar o menu. Ex: home" :value="isset($menu) ? $menu->route : null" />
                     </div>
 
                     <!-- is_active -->
                     <div>
-                        <label for="is_active" class="block font-medium">Está ativo? <span
+                        <label for="is_active" class="block text-sm font-medium text-gray-700 mb-1">Está ativo? <span
                                 class="text-red-500">*</span></label>
                         <x-select-tw name="is_active" :options="[]" placeholder="-- Nenhum --"
                             title="Selecione um menu PAI" required :value="isset($menu) ? $menu->is_active : null" />
                     </div>
 
                     <div>
-                        <label for="profile_id" class="block font-medium">Perfil de acesso <span
-                                class="text-red-500">*</span></label>
+                        <label for="profile_id" class="block text-sm font-medium text-gray-700 mb-1">Perfil de acesso
+                            <span class="text-red-500">*</span></label>
                         <x-select-tw name="profiles[]" :options="$profiles" placeholder="-- Selecione um perfil --"
                             title="Selecione um ou mais perfis para ter acesso a este menu" required />
                     </div>
@@ -98,4 +87,15 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const input = document.getElementById("iconInput");
+            const preview = document.getElementById("iconPreview");
+
+            input.addEventListener("input", function() {
+                preview.className = this.value + " text-xl";
+            });
+        });
+    </script>
 </x-layouts.auth_layout>

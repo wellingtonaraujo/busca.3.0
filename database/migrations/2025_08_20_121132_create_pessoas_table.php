@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nome')->unique();
             $table->string('cpf', 11)->unique();
             $table->integer('entidade_id')->unsigned();
+            $table->integer('sexo_id')->unsigned()->default(1);
             $table->string('matricula')->nullable();
             $table->date('nascimento')->nullable();
             $table->string('logradouro')->nullable();

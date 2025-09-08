@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Models\Adm\ProfileRoute;
 use App\Models\Adm\Route;
 use App\Models\Adm\UserStatus;
+use App\Models\Pessoa\Entidade;
 use App\Models\Pessoa\Pessoa;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -95,5 +96,9 @@ class User extends Authenticatable
 
     public function pessoa(){
         return $this->hasOne(Pessoa::class, 'id', 'pessoa_id');
+    }
+
+    public function entidade(){
+        return $this->hasOne(Entidade::class, 'id', 'entidade_atual_id');
     }
 }

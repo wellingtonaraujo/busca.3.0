@@ -29,7 +29,7 @@ return new class extends Migration
             $table->string('celular')->nullable();
             $table->string('email')->unique()->nullable();
             $table->integer('user_status_id')->unsigned()->defaut(1)->nullable();
-            $table->longText('foto_perfil')->nullable()->nullable();
+            $table->longblog('foto_perfil')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

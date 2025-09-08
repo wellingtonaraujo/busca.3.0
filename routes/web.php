@@ -8,6 +8,7 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ModeloController;
 use App\Http\Controllers\Pessoa\PessoaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use App\Http\Middleware\AuthorizedAccessRoute;
 use App\Models\Profile;
 use Illuminate\Support\Facades\Auth;
@@ -37,5 +38,6 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('profileRoute', ProfileRouteController::class, ['index']);
         Route::resource('acl', AclController::class, ['index']);
         Route::resource('pessoa', PessoaController::class, ['index']);
+        Route::resource('user', UserController::class, ['index']);
     });
 });

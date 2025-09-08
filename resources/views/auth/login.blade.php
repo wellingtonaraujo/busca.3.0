@@ -14,6 +14,30 @@
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
 
+                        {{-- ALERTA DE ERRO GLOBAL (login inválido) --}}
+                        @if ($errors->any())
+                            <div class="mb-4">
+                                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
+                                    <span class="block sm:inline">
+                                        {{ $errors->first() }}
+                                    </span>
+                                </div>
+                            </div>
+                        @endif
+
+
+                        {{-- ALERTA DE STATUS (ex: senha redefinida) --}}
+                        @if (session('status'))
+                            <div class="mb-4">
+                                <div
+                                    class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative">
+                                    <span class="block sm:inline">
+                                        {{ session('status') }}
+                                    </span>
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="mb-4">
                             <label for="cpf" class="block text-gray-600 text-sm font-medium mb-1">
                                 {{ __('Número do CPF') }} <span class="text-red-800">*</span>
@@ -31,7 +55,8 @@
                             <label for="password" class="block text-gray-600 text-sm font-medium mb-1">
                                 {{ __('Password') }}
                             </label>
-                            <input id="password" type="password" name="password" required title="No mínimo 8 caracteres"
+                            <input id="password" type="password" name="password" required
+                                title="No mínimo 8 caracteres"
                                 class="w-full px-4 py-2 border text-black rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('password') border-red-500 @enderror">
 
                             @error('password')

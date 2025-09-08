@@ -46,7 +46,7 @@ class PessoaController extends Controller
             ->with('titulo', $this->titulo)
             ->with('breadcrumbs', $this->breadcrumbs)
             ->with('otherButtons', $this->buttons)
-            ->with('pessoas', Pessoa::orderBy('id')->paginate(10));
+            ->with('pessoas', Pessoa::orderBy('id')->get());
     }
 
     public function create()
@@ -59,6 +59,42 @@ class PessoaController extends Controller
             ->with('breadcrumbs', $this->breadcrumbs)
             ->with('otherButtons', $this->buttons)
             ->with("sexoOptions", $sexoOptions);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'nome'        => ['required'],
+            'cpf'         => ['required'],
+            'entidade_id' => ['required'],
+            'matricula'   => ['required'],
+            'nascimento'  => ['required'],
+            'sexo_id'     => ['required'],
+            'cep'         => ['required'],
+            'logradouro'  => ['required'],
+            'numero'      => ['required'],
+            'complemento' => ['nullable', 'string'],
+            'bairro'      => ['required'],
+            'cidade'      => ['required'],
+            'uf'          => ['required'],
+            'email'       => ['required', 'email'],
+            'celular'     => ['required'],
+            'foto_perfil' => ['nullable', 'image', 'max:2048'], // pode ser nulo se o usuário não enviar
+        ]);
+
+        if ($request->hasFile('foto_perfil') && $request->file('foto_perfil')->isValid()) {
+            $file = $request->file('foto_perfil');
+            // Lê o conteúdo binário da imagem
+            $validated['foto_perfil'] = file_get_contents($file->getRealPath());
+        } else {
+            // Remove do array se não houver upload para não sobrescrever
+            unset($validated['foto_perfil']);
+        }
+
+        // criar a pessoa
+        $pessoaCreated = Pessoa::create($validated);
+
+        return redirect()->route('pessoa.index')->with('success', 'Pessoa criada com sucesso!');
     }
 
     public function edit($id)
@@ -87,32 +123,25 @@ class PessoaController extends Controller
             'logradouro'  => ['required'],
             'numero'      => ['required'],
             'complemento' => ['nullable', 'string'],
+            'bairro'      => ['required'],
             'cidade'      => ['required'],
             'uf'          => ['required'],
             'email'       => ['required', 'email'],
             'celular'     => ['required'],
-            'foto_perfil' => ['nullable', 'image', 'max:2048'],
+            'foto_perfil' => ['nullable', 'image', 'max:2048'], // pode ser nulo se o usuário não enviar
         ]);
 
-        // dd($request->all(), $validated);
-
-        // upload da imagem (se enviada)
-        if ($request->hasFile('foto_perfil')) {
+        if ($request->hasFile('foto_perfil') && $request->file('foto_perfil')->isValid()) {
             $file = $request->file('foto_perfil');
-            if ($file->isValid()) {
-                $destination = public_path('uploads/fotos_perfil');
-                if (!file_exists($destination)) {
-                    mkdir($destination, 0755, true);
-                }
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move($destination, $filename);
-                $validated['foto_perfil'] = 'uploads/fotos_perfil/' . $filename;
-            }
+            // Lê o conteúdo binário da imagem
+            $validated['foto_perfil'] = file_get_contents($file->getRealPath());
+        } else {
+            // Remove do array se não houver upload para não sobrescrever
+            unset($validated['foto_perfil']);
         }
 
-        // atualiza os dados
         $pessoa->update($validated);
 
-        return redirect()->route('pessoas.index')->with('success', 'Pessoa atualizada com sucesso!');
+        return redirect()->route('pessoa.index')->with('success', 'Pessoa atualizada com sucesso!');
     }
 }

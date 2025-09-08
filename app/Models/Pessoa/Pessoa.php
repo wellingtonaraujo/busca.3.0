@@ -23,6 +23,7 @@ class Pessoa extends Model
         'logradouro',
         'numero',
         'complemento',
+        'bairro',
         'cidade',
         'uf',
         'email',

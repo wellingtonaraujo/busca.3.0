@@ -27,7 +27,7 @@
                                     class="w-40 h-40 rounded-full object-cover shadow-lg border-4 border-gray-200" />
                             @else
                                 <img id="preview-foto"
-                                    src="{{ $pessoa->foto_perfil ? asset('storage/' . $pessoa->foto_perfil) : asset('assets/images/user.png') }}"
+                                    src="{{ asset('assets/images/user.png') }}"
                                     alt="Foto de Perfil"
                                     class="w-40 h-40 rounded-full object-cover shadow-lg border-4 border-gray-200 bg-gray-100 text-gray-500" />
                             @endif
@@ -37,8 +37,8 @@
                                 class="absolute bottom-2 right-2 cursor-pointer bg-green-600 text-white text-xs px-2 py-1 rounded-full shadow hover:bg-green-700">
                                 Alterar
                             </label>
-                            <input type="file" id="foto_perfil" name="file" accept="image/*" class="hidden"
-                                onchange="previewFoto(event)" required />
+                            <input type="file" id="foto_perfil" name="foto_perfil" accept="image/*" class="hidden"
+                                onchange="previewFoto(event)" />
                             <x-input-error class="mt-2" :messages="$errors->get('foto_perfil')" />
                         </div>
                         <span class="text-gray-700 font-medium">Foto de Perfil</span>
@@ -46,7 +46,7 @@
 
                     {{-- Coluna do formulário --}}
                     <div class="col-span-2 space-y-4">
-                        <h2 class="text-2xl font-semibold mb-6 text-left">Formulário de Cadastro</h2>
+                        <h2 class="text-2xl font-semibold mb-6 text-black text-left">Formulário de Cadastro</h2>
                         <div>
                             <label for="nome" class="block text-sm font-medium text-gray-700 mb-1">Nome da
                                 pessoa</label>

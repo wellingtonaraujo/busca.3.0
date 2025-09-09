@@ -39,5 +39,6 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('acl', AclController::class, ['index']);
         Route::resource('pessoa', PessoaController::class, ['index']);
         Route::resource('user', UserController::class, ['index']);
+        Route::get('/pessoas/{id}/cpf', [PessoaController::class, 'getCPF'])->name('pessoas.getCPF');
     });
 });

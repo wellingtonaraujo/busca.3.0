@@ -80,7 +80,7 @@
                             <!-- Entidade -->
                             <div class="md:col-span-5">
                                 <x-input-label for="entidade" :value="__('Órgão Público')" />
-                                <x-select-tw :options="$entidadeOptions" :selected="isset($pessoa) ? $pessoa->entidade_id : null" class="text-dark" required
+                                <x-select-tw :options="$entidadeOptions" :selected="isset($pessoa) ? $pessoa->entidade_id : null" class="select2 text-dark" required
                                     name="entidade_id" :selected="old('entidade_id', isset($pessoa) ? $pessoa->entidade_id : null)" autocomplete="pessoa" required />
                                 <x-input-error class="mt-2" :messages="$errors->get('entidade_id')" />
                             </div>

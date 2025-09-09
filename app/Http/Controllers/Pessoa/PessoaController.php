@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Adm\Sexo;
 use App\Models\Pessoa\Entidade;
 use App\Models\Pessoa\Pessoa;
+use App\Rules\ValidarCampos;
 use App\Traits\PageHeaderTrait;
 use Illuminate\Http\Request;
 
@@ -65,20 +66,20 @@ class PessoaController extends Controller
     {
         $validated = $request->validate([
             'nome'        => ['required'],
-            'cpf'         => ['required'],
+            'cpf'         => ['required', new ValidarCampos('cpf')],
             'entidade_id' => ['required'],
             'matricula'   => ['required'],
             'nascimento'  => ['required'],
             'sexo_id'     => ['required'],
-            'cep'         => ['required'],
+            'cep'         => ['required', new ValidarCampos('cep')],
             'logradouro'  => ['required'],
             'numero'      => ['required'],
             'complemento' => ['nullable', 'string'],
             'bairro'      => ['required'],
             'cidade'      => ['required'],
             'uf'          => ['required'],
-            'email'       => ['required', 'email'],
-            'celular'     => ['required'],
+            'email'       => ['required', new ValidarCampos('cpf')],
+            'celular'     => ['required', new ValidarCampos('celular')],
             'foto_perfil' => ['nullable', 'image', 'max:2048'], // pode ser nulo se o usuário não enviar
         ]);
 
@@ -143,5 +144,18 @@ class PessoaController extends Controller
         $pessoa->update($validated);
 
         return redirect()->route('pessoa.index')->with('success', 'Pessoa atualizada com sucesso!');
+    }
+
+    public function getCpf($id)
+    {
+        $pessoa = Pessoa::find($id);
+
+        if (!$pessoa) {
+            return response()->json(['error' => 'Pessoa não encontrada'], 404);
+        }
+
+        return response()->json([
+            'cpf' => $pessoa->cpf,
+        ]);
     }
 }

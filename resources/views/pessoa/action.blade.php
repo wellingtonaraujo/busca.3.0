@@ -5,6 +5,13 @@
     </a>
 @endif
 
+@if (Auth::user()->routeAccess('user.index'))
+    <a href="{{ route('pessoas.usuario', $model->id) }}" class="text-blue-500 hover:text-blue-700"
+        title="Dados do usuário">
+        <i class="ti ti-user text-2xl"></i>
+    </a>
+@endif
+
 @if (Auth::user()->routeAccess("$route.destroy"))
     <form action="{{ route("$route.destroy", $model->id) }}" method="POST"
         onsubmit="return confirm('Tem certeza que deseja excluir?')">

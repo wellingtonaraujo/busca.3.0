@@ -16,17 +16,50 @@
                         @method('PUT')
                     @endif
 
-                    {{-- Pessoa --}}
-                    <div class="md:col-span-5">
-                        <x-input-label for="pessoa" :value="__('Nome do usuário')" />
-                        @if (isset($user))
-                            <p class="text-black">CPF: <strong>{{ $user->pessoa->cpf }}</strong> : <strong>{{ $user->pessoa->nome }}</strong></p>
-                            <p class="text-black">Entidade de Origem: <strong>({{ $user->pessoa->entidade_id }}) </strong> <strong>{{ $user->pessoa->entidade->nome }}</strong> : <strong>{{ $user->pessoa->entidade->sigla }}</strong></p>
-                        @else
-                            <x-select-tw :options="$pessoaOptions" :selected="isset($user) ? $user->pessoa_id : null" class="select2 text-dark" required
-                                name="pessoa_id" :selected="old('pessoa_id', isset($user) ? $user->pessoa_id : null)" autocomplete="pessoa" required id="pessoa_id" />
-                        @endif
-                        <x-input-error class="mt-2" :messages="$errors->get('pessoa_id')" />
+                    {{-- Coluna da foto --}}
+                    <div class="flex items-start space-x-6">
+                        <div class="bg-gray=300 flex flex-col items-center justify-start space-y-4">
+                            <div class="relative">
+                                @if (!empty($user->pessoa->foto_perfil))
+                                    <img id="preview-foto"
+                                        src="data:image/jpeg;base64,{{ base64_encode($user->pessoa->foto_perfil) }}"
+                                        alt="Foto de Perfil"
+                                        class="w-20 h-20 rounded-full object-cover shadow-lg border-4 border-gray-200" />
+                                @else
+                                    <img id="preview-foto" src="{{ asset('assets/images/user.png') }}"
+                                        alt="Foto de Perfil"
+                                        class="w-20 h-20 rounded-full object-cover shadow-lg border-4 border-gray-200 bg-gray-100 text-gray-500" />
+                                @endif
+
+                                {{-- Botão de upload --}}
+                                <label for="foto_perfil"
+                                    class="absolute bottom-2 right-2 cursor-pointer bg-green-600 text-white text-xs px-2 py-1 rounded-full shadow hover:bg-green-700">
+                                    Alterar
+                                </label>
+                                <input type="file" id="foto_perfil" name="foto_perfil" accept="image/*"
+                                    class="hidden" onchange="previewFoto(event)" />
+                                <x-input-error class="mt-2" :messages="$errors->get('foto_perfil')" />
+                            </div>
+                            <span class="text-gray-700 font-medium">Foto de Perfil</span>
+                        </div>
+
+                        {{-- Pessoa --}}
+                        <div class="md:col-span-6">
+                            <x-input-label for="pessoa" :value="__('Nome do usuário')" />
+                            @if (isset($user))
+                                <p class="text-black">CPF: <strong>{{ $user->pessoa->cpf }}</strong> :
+                                    <strong>{{ $user->pessoa->nome }}</strong>
+                                </p>
+                                <p class="text-black">Entidade de Origem: <strong>({{ $user->pessoa->entidade_id }})
+                                    </strong> <strong>{{ $user->pessoa->entidade->nome }}</strong> :
+                                    <strong>{{ $user->pessoa->entidade->sigla }}</strong>
+                                </p>
+                            @else
+                                <x-select-tw :options="$pessoaOptions" :selected="isset($user) ? $user->pessoa_id : null" class="select2 text-dark" required
+                                    name="pessoa_id" :selected="old('pessoa_id', isset($user) ? $user->pessoa_id : null)" autocomplete="pessoa" required id="pessoa_id" />
+                            @endif
+                            <x-input-error class="mt-2" :messages="$errors->get('pessoa_id')" />
+                        </div>
                     </div>
 
                     <!-- Entidade -->
@@ -72,7 +105,7 @@
 
                     <div class="flex gap-2 pt-4">
                         <!-- Botão de voltar -->
-                        <a href="{{ route('user.index') }}">
+                        <a href="{{ route('pessoa.index') }}">
                             <button type="button" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-green-700">
                                 Voltar
                             </button>
@@ -83,7 +116,6 @@
                         </button>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>

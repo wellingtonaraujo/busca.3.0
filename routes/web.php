@@ -40,5 +40,6 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('pessoa', PessoaController::class, ['index']);
         Route::resource('user', UserController::class, ['index']);
         Route::get('/pessoas/{id}/cpf', [PessoaController::class, 'getCPF'])->name('pessoas.getCPF');
+        Route::get('/pessoas/{pessoa}/usuario', [PessoaController::class, 'usuario'])->name('pessoas.usuario');
     });
 });

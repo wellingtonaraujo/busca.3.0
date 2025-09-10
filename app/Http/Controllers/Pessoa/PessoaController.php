@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Adm\Sexo;
 use App\Models\Pessoa\Entidade;
 use App\Models\Pessoa\Pessoa;
+use App\Models\User;
 use App\Rules\ValidarCampos;
 use App\Traits\PageHeaderTrait;
 use Illuminate\Http\Request;
@@ -157,5 +158,15 @@ class PessoaController extends Controller
         return response()->json([
             'cpf' => $pessoa->cpf,
         ]);
+    }
+
+    public function usuario(Pessoa $pessoa){
+        $usuario = User::where('pessoa_id', $pessoa->id)->first();
+
+        if(is_null($usuario)){
+            return redirect()->route('user.create', ['pessoa' => $pessoa]);
+        }else{
+            return redirect()->route('user.edit', $usuario->id);
+        }
     }
 }

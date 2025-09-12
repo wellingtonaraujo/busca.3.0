@@ -11,6 +11,13 @@ Descrição breve do seu projeto aqui.
 
 ---
 
+# Configuração obrigatória
+### Composer versão 2.8.10
+### PHP versão 8.4.10
+### MySql versão 8.0.30
+### PhpMyAdmin versão 5.2.2
+### Npm versão 10.9.2
+
 ## Primeiros passos
 
 ### Versão do PHP

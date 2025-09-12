@@ -18,4 +18,8 @@ class Acl extends Model
     public function getRoutes($acl_name){
         return Route::where('name', 'like', "$acl_name.%")->get();
     }
+
+    public function setNameAttribute($value){
+        $this->attributes['name'] = strtolower($value);
+    }
 }

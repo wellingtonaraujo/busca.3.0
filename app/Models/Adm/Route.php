@@ -13,4 +13,8 @@ class Route extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function setNameAttribute($value){
+        $this->attributes['name'] = strtolower($value);
+    }
 }

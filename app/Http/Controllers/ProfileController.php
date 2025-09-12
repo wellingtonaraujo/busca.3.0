@@ -40,6 +40,7 @@ class ProfileController extends Controller
         }
 
         // acrescentando botões
+        $this->buttons[] = ['icon' => 'ti ti-key', 'link' => route('acl.index'),'bg' => 'bg-gray-600', 'text' => 'text-white', 'hover' => 'bg-gray-900', 'title' => 'Controle de Acesso.'];
         $this->buttons[] = ['icon' => 'ti ti-plus', 'link' => route('profile.create'), 'bg' => 'bg-gray-600', 'text' => 'text-white', 'hover' => 'bg-gray-900', 'title' => 'Novo registro'];
     }
 

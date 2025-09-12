@@ -18,7 +18,7 @@
 
                     <div>
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Nome</label>
-                        <x-input-tw type="text" name="name" :value="old('nome', isset($acl) ? Str::upper($acl->name) : null)" placeholder="nome ou nomeSobrenome"
+                        <x-input-tw type="text" name="name" :value="old('nome', isset($acl) ? $acl->name: null)" placeholder="nome ou nomeSobrenome"
                             title="Nome da acl - ex: teste ou testeTeste" required />
                         <x-input-error class="mt-2" :messages="$errors->get('name')" />
                     </div>

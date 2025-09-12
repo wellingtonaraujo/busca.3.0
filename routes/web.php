@@ -3,6 +3,7 @@
 use App\Http\Controllers\Adm\AclController;
 use App\Http\Controllers\Adm\EmpresaController;
 use App\Http\Controllers\Adm\ProfileRouteController;
+use App\Http\Controllers\Audit\AuditController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ModeloController;
@@ -41,5 +42,6 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('user', UserController::class, ['index']);
         Route::get('/pessoas/{id}/cpf', [PessoaController::class, 'getCPF'])->name('pessoas.getCPF');
         Route::get('/pessoas/{pessoa}/usuario', [PessoaController::class, 'usuario'])->name('pessoas.usuario');
+        Route::get('/audit', [AuditController::class, 'index'])->name('audit.index');
     });
 });

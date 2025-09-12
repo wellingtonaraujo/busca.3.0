@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Adm\Acl;
 use App\Models\Adm\Route;
 use App\Models\Adm\RouteMetodo;
+use App\Models\Audit\UserActionLog;
 use App\Models\Profile;
 use App\Traits\PageHeaderTrait;
 use Illuminate\Http\Request;
@@ -121,10 +122,12 @@ class AclController extends Controller
     {
         try {
             $oldAcl = $acl;
+            $routes = Route::where('name', "like", "$oldAcl->name%")->get();
+
             //validação dos dados
             $validated = $request->validate(
                 [
-                    'name' => ['required', 'string', 'unique:profiles,name'],
+                    'name' => ['required', 'string'],
                     'descricao' => ['required', 'string'],
                 ]
             );
@@ -135,8 +138,6 @@ class AclController extends Controller
                 'name' => $validated['name'],
                 'descricao' => $validated['descricao'],
             ]);
-
-            $routes = Route::where('name', "like", "$oldAcl->name.%")->get();
 
             if ($routes->count() > 0) {
                 foreach ($routes as $route) {

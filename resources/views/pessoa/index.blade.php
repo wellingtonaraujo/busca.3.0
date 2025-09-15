@@ -28,7 +28,11 @@
                                     <td class="px-4 py-2">{{ $model->id }}</td>
                                     <td class="px-4 py-2">
                                         @if ($model->foto_perfil)
-                                            <img src="data:image/jpeg;base64,{{ base64_encode($model->foto_perfil) }}"
+                                            @php
+                                                $finfo = new finfo(FILEINFO_MIME_TYPE);
+                                                $mime = $finfo->buffer($model->foto_perfil);
+                                            @endphp
+                                            <img src="data:{{ $mime }};base64,{{ base64_encode($model->foto_perfil) }}"
                                                 alt="Foto de {{ $model->nome }}"
                                                 class="w-10 h-10 rounded-full object-cover">
                                         @else

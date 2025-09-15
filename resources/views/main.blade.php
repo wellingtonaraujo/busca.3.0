@@ -4,7 +4,12 @@
             <strong>[TÍTULO DA PAGINA]</strong>
         </header>
 
-        {{-- <i class="ti ti-users text-5xl"></i> --}}
+        <i class="ti ti-user-square"></i>
+
+        {{-- <div style="position: relative; display: inline-block; font-size: 32px;">
+            <i class="ti ti-clipboard"></i>
+            <i class="ti ti-search" style="position: absolute; right: -8px; bottom: -8px; font-size: 14px;"></i>
+        </div> --}}
 
         <div
             class="flex gap-6 p-6 mt-6 bg-gray-200 shadow-md rounded-xl card grid grid-cols-1 lg:grid-cols-3 lg:gap-x-6 gap-x-0 lg:gap-y-0 gap-y-6">

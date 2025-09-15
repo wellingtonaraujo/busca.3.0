@@ -31,6 +31,7 @@ class AuditController extends Controller
             ->paginate(20);
 
         return view('audit.index', compact('logs'))
+            ->with('route', 'audit')
             ->with('titulo', $this->titulo)
             ->with('breadcrumbs', $this->breadcrumbs)
             ->with('otherButtons', $this->buttons);

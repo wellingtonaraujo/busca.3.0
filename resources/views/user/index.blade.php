@@ -41,9 +41,9 @@
                                     <td class="px-4 py-2">{{ $model->pessoa->nome }}</td>
                                     <td class="px-4 py-2">{{ $model->pessoa->cpf }}</td>
                                     <td class="px-4 py-2">{{ optional($model->entidade)->sigla }}</td>
-                                    <td class="px-4 py-2">{{ $model->departamento }}</td>
+                                    <td class="px-4 py-2">{{ optional($model)->departamento }}</td>
                                     <td class="px-4 py-2">{{ $model->funcao }}</td>
-                                    <td class="px-4 py-2">{{ $model->userStatus->descricao }}</td>
+                                    <td class="px-4 py-2">{{ optional($model->userStatus)->descricao }}</td>
                                     <td class="px-4 py-2 flex items-center space-x-2">@include('user.action')</td>
                                 </tr>
                             @endforeach

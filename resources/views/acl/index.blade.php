@@ -27,7 +27,7 @@
                                     </td>
                                     <td class="px-4 py-2">{{ $model->descricao }}</td>
                                     <td class="px-4 py-2 flex items-center space-x-2">
-                                        @include('profile.action')
+                                        @include('acl.action')
                                     </td>
                                 </tr>
                             @endforeach

@@ -13,25 +13,30 @@
                             <tr class="bg-gray-100 text-left">
                                 <th class="px-4 py-2">Data</th>
                                 <th class="px-4 py-2">Usuário</th>
+                                <th class="px-4 py-2">Entidade</th>
                                 <th class="px-4 py-2">Ação</th>
                                 <th class="px-4 py-2">Tabela</th>
                                 <th class="px-4 py-2">Registro</th>
                                 <th class="px-4 py-2">Alterações</th>
                                 <th class="px-4 py-2">IP</th>
+                                <th class="px-4 py-2">Registrado</th>
+                                <th class="px-4 py-2">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($logs as $log)
+                                {{-- {{ dd($log->user->entidade) }} --}}
                                 <tr>
                                     <td class="px-4 py-2">{{ $log->id }}</td>
                                     <td class="px-4 py-2">
                                         <details>
                                             <summary class="cursor-pointer text-blue-600">CPF:<strong>{{ $log->user->cpf }}</strong></summary>
                                             <div class="mt-1 bg-gray-50 p-2 rounded">
-                                                <strong>Nome:</strong> {{ $log->user->pessoa->nome }}
+                                                <strong>{{ $log->user->pessoa->nome }}</strong>
                                             </div>
                                         </details>
                                     </td>
+                                    <td class="px-4 py-2">{{ $log->user->entidade->sigla }}</td>
                                     <td class="px-4 py-2">{{ $log->action }}</td>
                                     <td class="px-4 py-2">{{ $log->table_name }}</td>
                                     <td class="px-4 py-2">{{ $log->record_id }}</td>
@@ -52,7 +57,9 @@
                                             <span class="text-gray-700">Consulta realizada</span>
                                         @endif
                                     </td>
+                                    <td class="px-4 py-2">{{ $log->ip_address }}</td>
                                     <td class="px-4 py-2">{{ $log->created_at }}</td>
+                                    <td class="px-4 py-2">@include('audit.action')</td>
                                 </tr>
                             @endforeach
                         </tbody>

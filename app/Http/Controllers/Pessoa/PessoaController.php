@@ -130,17 +130,22 @@ class PessoaController extends Controller
             'uf'          => ['required'],
             'email'       => ['required', 'email'],
             'celular'     => ['required'],
-            'foto_perfil' => ['nullable', 'image', 'max:2048'], // pode ser nulo se o usuário não enviar
+            // 'foto_perfil' => ['image', 'max:2048'], // pode ser nulo se o usuário não enviar
+            'foto_perfil' => 'file|image|max:2040', // até 5MB
         ]);
+
+
 
         if ($request->hasFile('foto_perfil') && $request->file('foto_perfil')->isValid()) {
             $file = $request->file('foto_perfil');
-            // Lê o conteúdo binário da imagem
-            $validated['foto_perfil'] = file_get_contents($file->getRealPath());
-        } else {
-            // Remove do array se não houver upload para não sobrescrever
-            unset($validated['foto_perfil']);
+            // lê o conteúdo binário real
+            $validated['foto_perfil'] = file_get_contents($file->getPathname());
         }
+
+        // dd([
+        //     'tamanho' => isset($validated['foto_perfil']) ? strlen($validated['foto_perfil']) : null,
+        //     'primeiros_bytes' => isset($validated['foto_perfil']) ? substr($validated['foto_perfil'], 0, 20) : null
+        // ]);
 
         $pessoa->update($validated);
 
@@ -160,12 +165,13 @@ class PessoaController extends Controller
         ]);
     }
 
-    public function usuario(Pessoa $pessoa){
+    public function usuario(Pessoa $pessoa)
+    {
         $usuario = User::where('pessoa_id', $pessoa->id)->first();
 
-        if(is_null($usuario)){
+        if (is_null($usuario)) {
             return redirect()->route('user.create', ['pessoa' => $pessoa]);
-        }else{
+        } else {
             return redirect()->route('user.edit', $usuario->id);
         }
     }

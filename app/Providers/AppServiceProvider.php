@@ -20,7 +20,16 @@ class AppServiceProvider extends ServiceProvider
         // Atualizado
         Event::listen('eloquent.updated: *', function ($event, $models) {
             $model = $models[0];
-            $this->logAction('update', $model, $model->getOriginal(), $model->getDirty());
+
+            // Apenas os campos alterados
+            $changes = $model->getDirty();
+
+            // Captura os valores antigos apenas dos campos alterados
+            $original = collect($changes)
+                ->mapWithKeys(fn($value, $field) => [$field => $model->getOriginal($field)])
+                ->toArray();
+
+            $this->logAction('update', $model, $original, $changes);
         });
 
         // Deletado

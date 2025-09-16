@@ -134,18 +134,11 @@ class PessoaController extends Controller
             'foto_perfil' => 'file|image|max:2040', // até 5MB
         ]);
 
-
-
         if ($request->hasFile('foto_perfil') && $request->file('foto_perfil')->isValid()) {
             $file = $request->file('foto_perfil');
             // lê o conteúdo binário real
             $validated['foto_perfil'] = file_get_contents($file->getPathname());
         }
-
-        // dd([
-        //     'tamanho' => isset($validated['foto_perfil']) ? strlen($validated['foto_perfil']) : null,
-        //     'primeiros_bytes' => isset($validated['foto_perfil']) ? substr($validated['foto_perfil'], 0, 20) : null
-        // ]);
 
         $pessoa->update($validated);
 

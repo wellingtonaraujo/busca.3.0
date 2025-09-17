@@ -34,7 +34,7 @@
                                         {{ $model->is_active ? 'Ativo' : 'Inativo' }}
                                     </td>
                                     <td class="px-4 py-2">
-                                        @foreach ($model->profileMenu as $item)
+                                        @foreach ($model->profileMenus as $item)
                                             {{ $item->profile->id }} {{ $item->profile->name }} <br>
                                         @endforeach
                                     </td>

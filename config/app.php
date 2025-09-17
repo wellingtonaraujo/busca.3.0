@@ -70,7 +70,8 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'America/Belem',
+
 
     /**
      * pagination_showing: Representa o início da frase que indica quais itens estão sendo exibidos.

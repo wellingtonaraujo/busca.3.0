@@ -39,10 +39,16 @@ class Menu extends Model
 
     public function profileMenu()
     {
+        return $this->hasOne(ProfileMenu::class, 'menu_id', 'id');
+    }
+
+    public function profileMenus()
+    {
+        // return $this->belongsToMany(Profile::class, 'profile_menus');
         return $this->hasMany(ProfileMenu::class, 'menu_id', 'id');
     }
 
-    public function Profile()
+    public function profile()
     {
         return $this->belongsToMany(Profile::class, 'profile_menus');
     }

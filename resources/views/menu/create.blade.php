@@ -60,14 +60,15 @@
                     <div>
                         <label for="is_active" class="block text-sm font-medium text-gray-700 mb-1">Está ativo? <span
                                 class="text-red-500">*</span></label>
-                        <x-select-tw name="is_active" :options="[]" placeholder="-- Nenhum --"
+                        <x-select-tw name="is_active" :options="[]" :selected="isset($menu) ? $menu->is_active : null" placeholder="-- Nenhum --"
                             title="Selecione um menu PAI" required :value="isset($menu) ? $menu->is_active : null" />
                     </div>
 
+                    {{-- {{ dd($menu->profileMenu) }} --}}
                     <div>
                         <label for="profile_id" class="block text-sm font-medium text-gray-700 mb-1">Perfil de acesso
                             <span class="text-red-500">*</span></label>
-                        <x-select-tw name="profiles[]" :options="$profiles" placeholder="-- Selecione um perfil --"
+                        <x-select-tw name="profiles[]" :options="$profiles" :selected="isset($menu) ? $menu->profileMenu->profile_id : null" placeholder="-- Selecione um perfil --"
                             title="Selecione um ou mais perfis para ter acesso a este menu" required />
                     </div>
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\Adm\AclController;
 use App\Http\Controllers\Adm\EmpresaController;
 use App\Http\Controllers\Adm\ProfileRouteController;
 use App\Http\Controllers\Audit\AuditController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ModeloController;
@@ -26,12 +27,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 // Auth::logout();
-Route::get('/', [MainController::class, 'index'])->middleware(['auth', 'verified'])->name('home');
+// rota padrão
+// Route::get('/', [MainController::class, 'index'])->middleware(['auth', 'verified'])->name('home');
+
+// rota para o dashboard do sistema carceris
+// Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('home');
 
 Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [MainController::class, 'index'])->name('home');
+    Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('home');
     Route::middleware([AuthorizedAccessRoute::class])->group(function () {
         Route::resource('menu', MenuController::class, ['index']);
         Route::resource('modelo', ModeloController::class, ['index']);

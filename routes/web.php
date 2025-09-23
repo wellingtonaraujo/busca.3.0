@@ -10,6 +10,7 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ModeloController;
 use App\Http\Controllers\Pessoa\PessoaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AuthorizedAccessRoute;
 use App\Models\Profile;
@@ -37,7 +38,7 @@ Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [MainController::class, 'index'])->name('home');
-    Route::get('/', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('home');
+    Route::get('/', [SearchController::class, 'index'])->middleware(['auth', 'verified'])->name('search');
     Route::middleware([AuthorizedAccessRoute::class])->group(function () {
         Route::resource('menu', MenuController::class, ['index']);
         Route::resource('modelo', ModeloController::class, ['index']);

@@ -12,7 +12,7 @@
             ->get();
     @endphp
     <aside class="bg-gray-800 shadow-md w-[300px] hidden lg:block rounded-xl" id="main-menu">
-        <div class="bg-yellow-500 text-black p-4 rounded-xl">
+        <div class="bg-cyan-500 text-black p-4 rounded-xl">
             <a href="#" class="flex flex-row items-center">
                 <img src="{{ asset('assets/images/logos/carceris.svg') }}" width="20" alt="Logo-Dark" />
                 <p class="ms-3"><strong>Menu de Opções</strong></p>

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+
 $username = 'userdb';
 $passwd = 'spnwbi@siapenweb_bi#db4Fxt%N]lIJuh]AB5$&@-';
 
@@ -57,12 +58,33 @@ return [
             ]) : [],
         ],
 
-        'siapenbusca' => [
+        'siapen' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => '10.155.52.3',
+            'port' => env('DB_PORT', '3306'),
+            'database' => 'siapen',
+            'username' => 'root',
+            'password' => 'mysqldb',
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8',
+            'collation' => 'utf8_general_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
+
+        'siapenweb_dp' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => 'siapenbusca',
+            'database' => 'siapenweb_dp',
             'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
@@ -109,7 +131,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [

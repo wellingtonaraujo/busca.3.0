@@ -1,7 +1,7 @@
 <x-layouts.auth_layout>
     <div class="bg-gray-900 min-h-screen">
         <div
-            class="bg-gray-900 text-gray-200 p-6 rounded-xl shadow-md max-w-6xl mx-auto border border-cyan-500 transition transform hover:scale-105 hover:shadow-cyan-500/50">
+            class="bg-gray-900 text-gray-200 p-6 rounded-xl shadow-md max-w-6xl mx-auto border border-cyan-500 hover:shadow-cyan-500/50">
             <!-- Título -->
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-semibold flex items-center">
@@ -29,19 +29,12 @@
                 <x-form-input-text name="rg_num" placeholder="Nº RG (Só números)" />
                 <x-form-input-text name="contato" placeholder="Contato (Só números)" />
                 <x-form-input-text name="contato_nome" placeholder="Nome do contato (Ex. Nome da Mãe)" />
-                <x-form-input-select name="regime_id"
-                    :options="$regimes"
-                    placeholder="Regime de prisão"
+                <x-form-input-select name="regime_id" :options="$regimes" placeholder="Regime de prisão"
                     :value="null" />
-                <x-form-input-select name="custodiado_situacao_atual_id"
-                    :options="$situacaoAtual"
-                    placeholder="Situação pricional"
-                    :value="null" />
-                <x-form-input-select name="order_by"
-                    :options="['id' => 'Id da pessoa', 'nome' => 'Nome da pessoa', 'regime' => 'Situação']"
-                    placeholder="Ordenar por..."
-                    :value="null" />
-                            <!-- Botões -->
+                <x-form-input-select name="custodiado_situacao_atual_id" :options="$situacaoAtual"
+                    placeholder="Situação pricional" :value="null" />
+                <x-form-input-select name="order_by" :options="['id' => 'Id da pessoa', 'nome' => 'Nome da pessoa', 'regime' => 'Situação']" placeholder="Ordenar por..." :value="null" />
+                <!-- Botões -->
                 <div class="flex gap-4 mt-6">
                     <button type="submit"
                         class="flex items-center gap-2 px-6 py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg shadow-md transition">
@@ -73,5 +66,55 @@
                 ordem.
             </p>
         </div>
+
+        {{-- resultado da busca --}}
+        @if (!is_null($custodiados))
+            <div
+                class="bg-gray-900 text-gray-200 p-6 rounded-xl shadow-md max-w-6xl mx-auto border border-cyan-500 hover:shadow-cyan-500/50 mt-6">
+                <!-- Título do resultado -->
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-cyan-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                        Resultado da Pesquisa
+                    </h2>
+                </div>
+
+                <!-- Tabela -->
+                <div class="w-full overflow-x-auto">
+                    <table class="min-w-[600px] w-full text-sm text-left border-collapse">
+                        <thead class="bg-gray-800 text-gray-200 border-b border-gray-700">
+                            <tr>
+                                <th class="px-4 py-2 font-semibold">Id</th>
+                                <th class="px-4 py-2 font-semibold">Nome</th>
+                                <th class="px-4 py-2 font-semibold">Alcunha</th>
+                                <th class="px-4 py-2 font-semibold">Regime</th>
+                                <th class="px-4 py-2 font-semibold">Situação</th>
+                                <th class="px-4 py-2 font-semibold">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($custodiados as $model)
+                                <tr class="border-b border-gray-800 hover:bg-gray-800">
+                                    <td class="px-4 py-2">{{ $model->id }}</td>
+                                    <td class="px-4 py-2 truncate max-w-xs" title="{{ $model->nome }}">
+                                        {{ $model->nome }}
+                                    </td>
+                                    <td class="px-4 py-2">{{ $model->alcunha }}</td>
+                                    <td class="px-4 py-2">{{ $model->regime }}</td>
+                                    <td class="px-4 py-2">{{ $model->status }}</td>
+                                    <td class="px-4 py-2 flex items-center space-x-2">
+                                        @include('search.action')
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
+
     </div>
 </x-layouts.auth_layout>

@@ -16,6 +16,6 @@ class SearchController extends Controller
         $regimes = $this->regimeOpcoes();
         $custodiados = $this->search(request());
 
-        return view('search', compact('situacaoAtual', 'regimes', 'custodiados'));
+        return view('search.index', compact('situacaoAtual', 'regimes', 'custodiados'));
     }
 }

@@ -27,28 +27,50 @@ trait SearchTrait
 
     public function search(Request $request)
     {
-        $search = DB::connection('siapenweb_dp')->table('custodiados')
-            ->join('pessoas', 'custodiados.pessoa_id', '=', 'pessoas.id') // ajusta conforme suas chaves
-            ->when($request->nome, function ($query, $nome) {
-                $query->where('nome', 'like', "%{$nome}%");
-            })
-            ->when($request->alcunha, function ($query, $alcunha) {
-                $query->where('alcunha', 'like', "%{$alcunha}%");
-            })
-            ->when($request->regime, function ($query, $regime) {
-                $query->where('regime_id', $regime);
-            })
-            ->when($request->status, function ($query, $status) {
-                $query->where('custodiado_situacao_atual_id', $status);
-            })
-            ->whereNotNull('nome') // garante que nome não seja nulo
-            ->when($request->order_by, function ($query, $order_by) {
-                $query->orderBy($order_by);
-            }, function ($query) {
-                $query->orderBy('nome'); // fallback quando $request->order_by é null
-            })
-            ->get();
+        if (!empty(array_filter($request->all()))) {
+            $search = DB::connection('siapenweb_dp')->table('custodiados')
+                ->join('pessoas', 'custodiados.pessoa_id', '=', 'pessoas.id') // ajusta conforme suas chaves
+                ->join('pessoa_documentos as pd', 'pd.pessoa_id', 'pessoas.id')
+                ->join('regimes', 'regimes.id', 'custodiados.regime_id')
+                ->join('custodiado_situacao_atuals as situacao', 'situacao.id', 'custodiados.custodiado_situacao_atual_id')
+                ->when($request->nome, function ($query, $nome) {
+                    $query->where('nome', 'like', "%{$nome}%");
+                })
+                ->when($request->alcunha, function ($query, $alcunha) {
+                    $query->where('alcunha', 'like', "%{$alcunha}%");
+                })
+                ->when($request->regime, function ($query, $regime) {
+                    $query->where('regime_id', $regime);
+                })
+                ->when($request->status, function ($query, $status) {
+                    $query->where('custodiado_situacao_atual_id', $status);
+                })
+                ->when($request->cpf, function ($query, $cpf) {
+                    $query->where('pd.documento_tipo_id', 2)
+                        ->where('pd.documento_numero', $cpf);
+                })
+                ->when($request->rg, function ($query, $rg) {
+                    $query->where('pd.documento_tipo_id', 1)
+                        ->where('pd.documento_numero', $rg);
+                })
+                ->whereNotNull('nome') // garante que nome não seja nulo
+                ->when($request->order_by, function ($query, $order_by) {
+                    $query->orderBy($order_by);
+                }, function ($query) {
+                    $query->orderBy('nome'); // fallback quando $request->order_by é null
+                })
+                ->select(
+                    'custodiados.id',
+                    'pessoas.nome',
+                    'pessoas.alcunha',
+                    'regimes.descricao as regime',
+                    'situacao.descricao as status',
+                )
+                ->get();
 
-        return $search;
+            return $search;
+        }
+
+        return null;
     }
 }

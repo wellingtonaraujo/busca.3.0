@@ -1,7 +1,7 @@
 <x-layouts.auth_login_layout>
     <div class="">
         <div class="flex items-center justify-center h-screen w-screen bg-gray-900">
-            <div class="p-6 bg-gradient-to-r from-cyan-800 via-cyan-500 to-cyan-500 shadow-lg rounded-lg">
+            <div class="p-6 bg-gradient-to-r from-blue-800 via-blue-700 to-blue-500 shadow-lg rounded-lg">
                 <div class="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
                     <h2 class="text-2xl font-semibold text-center mb-6 text-gray-700">
                         <div class="flex items-center justify-center gap-2">

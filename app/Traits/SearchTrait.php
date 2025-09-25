@@ -27,6 +27,8 @@ trait SearchTrait
 
     public function search(Request $request)
     {
+        dump($request->all());
+
         if (!empty(array_filter($request->all()))) {
             $search = DB::connection('siapenweb_dp')->table('custodiados')
                 ->join('pessoas', 'custodiados.pessoa_id', '=', 'pessoas.id') // ajusta conforme suas chaves
@@ -36,14 +38,14 @@ trait SearchTrait
                 ->when($request->nome, function ($query, $nome) {
                     $query->where('nome', 'like', "%{$nome}%");
                 })
-                ->when($request->alcunha, function ($query, $alcunha) {
-                    $query->where('alcunha', 'like', "%{$alcunha}%");
+                ->when($request->apelido, function ($query, $apelido) {
+                    $query->where('alcunha', 'like', "%{$apelido}%");
                 })
                 ->when($request->regime, function ($query, $regime) {
                     $query->where('regime_id', $regime);
                 })
-                ->when($request->status, function ($query, $status) {
-                    $query->where('custodiado_situacao_atual_id', $status);
+                ->when($request->custodiado_situacao_atual_id, function ($query, $custodiado_situacao_atual_id) {
+                    $query->where('custodiado_situacao_atual_id', $custodiado_situacao_atual_id);
                 })
                 ->when($request->cpf, function ($query, $cpf) {
                     $query->where('pd.documento_tipo_id', 2)
@@ -69,6 +71,14 @@ trait SearchTrait
                 ->get();
 
             return $search;
+        }
+
+        return null;
+    }
+
+    public function parametros(Request $request){
+        if (!empty(array_filter($request->all()))) {
+            return $request->all();
         }
 
         return null;

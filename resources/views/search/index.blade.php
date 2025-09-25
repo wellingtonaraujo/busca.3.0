@@ -23,17 +23,17 @@
 
             <!-- Formulário -->
             <form action="{{ route('search') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <x-form-input-text name="nome" placeholder="Nome" />
-                <x-form-input-text name="apelido" placeholder="Apelido / Codnome" />
-                <x-form-input-text name="cpf" placeholder="Nº CPF (Só números)" />
-                <x-form-input-text name="rg_num" placeholder="Nº RG (Só números)" />
-                <x-form-input-text name="contato" placeholder="Contato (Só números)" />
-                <x-form-input-text name="contato_nome" placeholder="Nome do contato (Ex. Nome da Mãe)" />
+                <x-form-input-text name="nome" placeholder="Nome" :value="$parametros['nome'] ?? ''" />
+                <x-form-input-text name="apelido" placeholder="Apelido / Codnome" :value="$parametros['apelido'] ?? ''"  />
+                <x-form-input-text name="cpf" placeholder="Nº CPF (Só números)" :value="$parametros['cpf'] ?? ''" />
+                <x-form-input-text name="rg_num" placeholder="Nº RG (Só números)" :value="$parametros['rg_num'] ?? ''" />
+                <x-form-input-text name="contato" placeholder="Contato (Só números)" :value="$parametros['contato'] ?? ''" />
+                <x-form-input-text name="contato_nome" placeholder="Nome do contato (Ex. Nome da Mãe)" :value="$parametros['contato_nome'] ?? ''" />
                 <x-form-input-select name="regime_id" :options="$regimes" placeholder="Regime de prisão"
-                    :value="null" />
+                    :value="$parametros['regime_id'] ?? ''"  />
                 <x-form-input-select name="custodiado_situacao_atual_id" :options="$situacaoAtual"
-                    placeholder="Situação pricional" :value="null" />
-                <x-form-input-select name="order_by" :options="['id' => 'Id da pessoa', 'nome' => 'Nome da pessoa', 'regime' => 'Situação']" placeholder="Ordenar por..." :value="null" />
+                    placeholder="Situação pricional" :value="null" :value="$parametros['custodiado_situacao_atual_id'] ?? ''" />
+                <x-form-input-select name="order_by" :options="['id' => 'Id da pessoa', 'nome' => 'Nome da pessoa', 'regime' => 'Situação']" placeholder="Ordenar por..." :value="null" :value="$parametros['order_by'] ?? ''"/>
                 <!-- Botões -->
                 <div class="flex gap-4 mt-6">
                     <button type="submit"
@@ -83,36 +83,71 @@
                 </div>
 
                 <!-- Tabela -->
-                <div class="w-full overflow-x-auto">
-                    <table class="min-w-[600px] w-full text-sm text-left border-collapse">
-                        <thead class="bg-gray-800 text-gray-200 border-b border-gray-700">
-                            <tr>
-                                <th class="px-4 py-2 font-semibold">Id</th>
-                                <th class="px-4 py-2 font-semibold">Nome</th>
-                                <th class="px-4 py-2 font-semibold">Alcunha</th>
-                                <th class="px-4 py-2 font-semibold">Regime</th>
-                                <th class="px-4 py-2 font-semibold">Situação</th>
-                                <th class="px-4 py-2 font-semibold">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($custodiados as $model)
-                                <tr class="border-b border-gray-800 hover:bg-gray-800">
-                                    <td class="px-4 py-2">{{ $model->id }}</td>
-                                    <td class="px-4 py-2 truncate max-w-xs" title="{{ $model->nome }}">
-                                        {{ $model->nome }}
-                                    </td>
-                                    <td class="px-4 py-2">{{ $model->alcunha }}</td>
-                                    <td class="px-4 py-2">{{ $model->regime }}</td>
-                                    <td class="px-4 py-2">{{ $model->status }}</td>
-                                    <td class="px-4 py-2 flex items-center space-x-2">
-                                        @include('search.action')
-                                    </td>
+                <div class="w-full">
+                    <div class="hidden md:block w-full overflow-x-auto">
+                        <!-- Tabela normal para desktop -->
+                        <table class="min-w-[600px] w-full text-sm text-left border-collapse">
+                            <thead class="bg-gray-800 text-gray-200 border-b border-gray-700">
+                                <tr>
+                                    <th class="px-4 py-2 font-semibold">Id</th>
+                                    <th class="px-4 py-2 font-semibold">Nome</th>
+                                    <th class="px-4 py-2 font-semibold">Alcunha</th>
+                                    <th class="px-4 py-2 font-semibold">Regime</th>
+                                    <th class="px-4 py-2 font-semibold">Situação</th>
+                                    <th class="px-4 py-2 font-semibold">Ações</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach ($custodiados as $model)
+                                    <tr class="border-b border-gray-800 hover:bg-gray-700 transition-colors">
+                                        <td class="px-4 py-2">{{ $model->id }}</td>
+                                        <td class="px-4 py-2 truncate max-w-xs" title="{{ $model->nome }}">
+                                            {{ $model->nome }}</td>
+                                        <td class="px-4 py-2">{{ $model->alcunha }}</td>
+                                        <td class="px-4 py-2">{{ $model->regime }}</td>
+                                        <td class="px-4 py-2">{{ $model->status }}</td>
+                                        <td class="px-4 py-2 flex items-center space-x-2">
+                                            @include('search.action')
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Card view para mobile -->
+                    <div class="md:hidden space-y-4">
+                        @foreach ($custodiados as $model)
+                            <div class="bg-gray-800 text-gray-200 p-4 rounded-lg shadow-md border border-gray-700">
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-semibold">Id:</span>
+                                    <span>{{ $model->id }}</span>
+                                </div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-semibold">Nome:</span>
+                                    <span class="truncate max-w-xs"
+                                        title="{{ $model->nome }}">{{ $model->nome }}</span>
+                                </div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-semibold">Alcunha:</span>
+                                    <span>{{ $model->alcunha }}</span>
+                                </div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-semibold">Regime:</span>
+                                    <span>{{ $model->regime }}</span>
+                                </div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="font-semibold">Situação:</span>
+                                    <span>{{ $model->status }}</span>
+                                </div>
+                                <div class="flex justify-start mt-2 space-x-2">
+                                    @include('search.action')
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
+
             </div>
         @endif
 

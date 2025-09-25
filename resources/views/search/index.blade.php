@@ -22,18 +22,25 @@
             </div>
 
             <!-- Formulário -->
-            <form action="{{ route('search') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <x-form-input-text name="nome" placeholder="Nome" :value="$parametros['nome'] ?? ''" />
-                <x-form-input-text name="apelido" placeholder="Apelido / Codnome" :value="$parametros['apelido'] ?? ''"  />
-                <x-form-input-text name="cpf" placeholder="Nº CPF (Só números)" :value="$parametros['cpf'] ?? ''" />
-                <x-form-input-text name="rg_num" placeholder="Nº RG (Só números)" :value="$parametros['rg_num'] ?? ''" />
-                <x-form-input-text name="contato" placeholder="Contato (Só números)" :value="$parametros['contato'] ?? ''" />
-                <x-form-input-text name="contato_nome" placeholder="Nome do contato (Ex. Nome da Mãe)" :value="$parametros['contato_nome'] ?? ''" />
-                <x-form-input-select name="regime_id" :options="$regimes" placeholder="Regime de prisão"
-                    :value="$parametros['regime_id'] ?? ''"  />
-                <x-form-input-select name="custodiado_situacao_atual_id" :options="$situacaoAtual"
-                    placeholder="Situação pricional" :value="null" :value="$parametros['custodiado_situacao_atual_id'] ?? ''" />
-                <x-form-input-select name="order_by" :options="['id' => 'Id da pessoa', 'nome' => 'Nome da pessoa', 'regime' => 'Situação']" placeholder="Ordenar por..." :value="null" :value="$parametros['order_by'] ?? ''"/>
+            <form action="{{ route('search') }}" method="GET">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <x-form-input-text name="nome" placeholder="Nome" :value="$parametros['nome'] ?? ''" />
+                    <x-form-input-text name="apelido" placeholder="Apelido / Codnome" :value="$parametros['apelido'] ?? ''" />
+                    <x-form-input-select name="documento_tipo_id" :options="[1 => 'Carteira de Identidade', 2 => 'CPF - Cadastro de pessoa física']" placeholder="Tipo de documento"
+                        :value="null" :value="$parametros['documento_tipo_id'] ?? 2" />
+                    <x-form-input-text name="documento_numero" placeholder="Número do documento" :value="$parametros['documento_numero'] ?? ''" />
+                    {{-- <x-form-input-text name="rg_num" placeholder="Nº RG (Só números)" :value="$parametros['rg_num'] ?? ''" /> --}}
+                    <x-form-input-text name="contato" placeholder="Contato (Só números)" :value="$parametros['contato'] ?? ''" />
+                    <x-form-input-text name="contato_nome" placeholder="Nome do contato (Ex. Nome da Mãe)"
+                        :value="$parametros['contato_nome'] ?? ''" />
+                    <x-form-input-select name="regime_id" :options="$regimes" placeholder="Regime de prisão"
+                        :value="$parametros['regime_id'] ?? ''" />
+                    <x-form-input-select name="custodiado_situacao_atual_id" :options="$situacaoAtual"
+                        placeholder="Situação pricional" :value="null" :value="$parametros['custodiado_situacao_atual_id'] ?? ''" />
+                    <x-form-input-select name="order_by" :options="['id' => 'Id da pessoa', 'nome' => 'Nome da pessoa', 'regime' => 'Situação']" placeholder="Ordenar por..."
+                        :value="null" :value="$parametros['order_by'] ?? ''" />
+                </div>
+
                 <!-- Botões -->
                 <div class="flex gap-4 mt-6">
                     <button type="submit"
@@ -101,11 +108,11 @@
                                 @foreach ($custodiados as $model)
                                     <tr class="border-b border-gray-800 hover:bg-gray-700 transition-colors">
                                         <td class="px-4 py-2">{{ $model->id }}</td>
-                                        <td class="px-4 py-2 truncate max-w-xs" title="{{ $model->nome }}">
-                                            {{ $model->nome }}</td>
-                                        <td class="px-4 py-2">{{ $model->alcunha }}</td>
-                                        <td class="px-4 py-2">{{ $model->regime }}</td>
-                                        <td class="px-4 py-2">{{ $model->status }}</td>
+                                        <td class="px-4 py-2 truncate max-w-xs" title="{{ $model->pessoa->nome }}">
+                                            {{ $model->pessoa->nome }}</td>
+                                        <td class="px-4 py-2">{{ $model->pessoa->alcunha }}</td>
+                                        <td class="px-4 py-2">{{ $model->regime->descricao }}</td>
+                                        <td class="px-4 py-2">{{ $model->situacaoAtual->descricao }}</td>
                                         <td class="px-4 py-2 flex items-center space-x-2">
                                             @include('search.action')
                                         </td>

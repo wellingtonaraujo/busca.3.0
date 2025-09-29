@@ -11,6 +11,6 @@ trait PageHeaderTrait
     public function initPageHeader()
     {
         // inicialização da trait
-        $this->breadcrumbs[] = ['label' => 'Home', 'link' => route('home'), 'icon' => 'ti ti-home'];
+        $this->breadcrumbs[] = ['label' => 'Home', 'link' => route('search'), 'icon' => 'ti ti-home'];
     }
 }

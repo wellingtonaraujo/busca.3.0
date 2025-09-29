@@ -31,7 +31,10 @@
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         },
-        "files": ["app/Helpers/twClass.php"]
+        "files": [
+            "app/Helpers/twClass.php",
+            "app/Helpers/customHelper.php"
+        ]
 
     },
     "autoload-dev": {

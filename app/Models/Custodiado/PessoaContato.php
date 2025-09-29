@@ -24,10 +24,10 @@ class PessoaContato extends Model
     }
 
     public function contatoTipo(){
-        // return $this->hasOne(ContatoTipo::class, 'id', 'contato_tipo_id');
+        return $this->hasOne(ContatoTipo::class, 'id', 'contato_tipo_id');
     }
 
     public function vinculadoTipo(){
-        // return $this->hasOne(VinculadoTipo::class, 'id', 'vinculado_tipo_id');
+        return $this->hasOne(VinculadoTipo::class, 'id', 'vinculado_tipo_id');
     }
 }

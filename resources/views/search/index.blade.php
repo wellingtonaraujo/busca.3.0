@@ -33,12 +33,12 @@
                     <x-form-input-text name="contato" placeholder="Contato (Só números)" :value="$parametros['contato'] ?? ''" />
                     <x-form-input-text name="contato_nome" placeholder="Nome do contato (Ex. Nome da Mãe)"
                         :value="$parametros['contato_nome'] ?? ''" />
-                    <x-form-input-select name="regime_id" :options="$regimes" placeholder="Regime de prisão"
+                    {{-- <x-form-input-select name="regime_id" :options="$regimes" placeholder="Regime de prisão"
                         :value="$parametros['regime_id'] ?? ''" />
                     <x-form-input-select name="custodiado_situacao_atual_id" :options="$situacaoAtual"
                         placeholder="Situação pricional" :value="null" :value="$parametros['custodiado_situacao_atual_id'] ?? ''" />
                     <x-form-input-select name="order_by" :options="['id' => 'Id da pessoa', 'nome' => 'Nome da pessoa', 'regime' => 'Situação']" placeholder="Ordenar por..."
-                        :value="null" :value="$parametros['order_by'] ?? ''" />
+                        :value="null" :value="$parametros['order_by'] ?? ''" /> --}}
                 </div>
 
                 <!-- Botões -->
@@ -75,7 +75,7 @@
         </div>
 
         {{-- resultado da busca --}}
-        @if (!is_null($custodiados))
+        @if (!is_null($pessoas))
             <div
                 class="bg-gray-900 text-gray-200 p-6 rounded-xl shadow-md max-w-6xl mx-auto border border-cyan-500 hover:shadow-cyan-500/50 mt-6">
                 <!-- Título do resultado -->
@@ -85,7 +85,8 @@
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                         </svg>
-                        Resultado da Pesquisa
+                        Resultado da Pesquisa : <strong>{{ $pessoas->count() }} pessoas encontradas. Consulta demorou
+                            <strong>{{ $tempoExecucao }} segundos</strong>.</strong>
                     </h2>
                 </div>
 
@@ -96,23 +97,66 @@
                         <table class="min-w-[600px] w-full text-sm text-left border-collapse">
                             <thead class="bg-gray-800 text-gray-200 border-b border-gray-700">
                                 <tr>
-                                    <th class="px-4 py-2 font-semibold">Id</th>
+                                    <th class="px-4 py-2 font-semibold">#</th>
+                                    {{-- <th class="px-4 py-2 font-semibold">Id</th> --}}
                                     <th class="px-4 py-2 font-semibold">Nome</th>
                                     <th class="px-4 py-2 font-semibold">Alcunha</th>
-                                    <th class="px-4 py-2 font-semibold">Regime</th>
-                                    <th class="px-4 py-2 font-semibold">Situação</th>
+                                    <th class="px-4 py-2 font-semibold">Contato</th>
+                                    <th class="px-4 py-2 font-semibold">Custodiado</th>
+                                    <th class="px-4 py-2 font-semibold">Vinculado</th>
                                     <th class="px-4 py-2 font-semibold">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($custodiados as $model)
+                                @foreach ($pessoas as $model)
                                     <tr class="border-b border-gray-800 hover:bg-gray-700 transition-colors">
-                                        <td class="px-4 py-2">{{ $model->id }}</td>
-                                        <td class="px-4 py-2 truncate max-w-xs" title="{{ $model->pessoa->nome }}">
-                                            {{ $model->pessoa->nome }}</td>
-                                        <td class="px-4 py-2">{{ $model->pessoa->alcunha }}</td>
-                                        <td class="px-4 py-2">{{ $model->regime->descricao }}</td>
-                                        <td class="px-4 py-2">{{ $model->situacaoAtual->descricao }}</td>
+                                        <td class="px-4 py-2 align-top">{{ $loop->iteration }}</td>
+                                        {{-- <td class="px-4 py-2 align-top">{{ $model->id }}</td> --}}
+                                        <td class="px-4 py-2 truncate max-w-xs align-top" title="{{ $model->nome }}">
+                                            {{ $model->nome }}</td>
+                                        <td class="px-4 py-2 align-top">{{ $model->alcunha }}</td>
+                                        <td class="px-4 py-2 align-top">
+                                            @if ($contatos = $model->contatos)
+                                                @foreach ($contatos as $contato)
+                                                    <details>
+                                                        <summary class="cursor-pointer text-orange-400">
+                                                            @if(!is_null($contato->nome))
+                                                                ({{ optional($contato)->vinculadoTipo?->descricao }})
+                                                                {{ $contato->nome }}
+                                                            @else
+                                                                PESSOAL
+                                                            @endif
+                                                        </summary>
+                                                        <div class="mt-1 bg-gray-800 p-2 rounded text-yellow-300">
+                                                            {{ optional($contato)->contatoTipo?->descricao }}
+                                                            <strong>{{ $contato->contato }}</strong>
+                                                        </div>
+                                                    </details>
+                                                @endforeach
+                                            @else
+                                                Nenhum
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-2 align-top">
+                                            @if ($custodiado = $model->custodiado)
+                                                <details>
+                                                    <summary class="cursor-pointer text-orange-400">
+                                                        Regime:
+                                                        <strong>{{ optional($model->custodiado)->regime?->descricao }}</strong>
+                                                    </summary>
+                                                    <div class="mt-1 bg-gray-800 p-2 rounded text-yellow-300">
+                                                        Situação:
+                                                        <strong>{{ optional($model->custodiado)->situacaoAtual?->descricao }}</strong>
+                                                    </div>
+                                                </details>
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-2 text-green-400">
+                                            @if ($vinculado = $model->vinculado)
+                                                * Situação:
+                                                <strong>{{ optional($model->vinculado)->vinculadoStatus?->descricao }}</strong>
+                                            @endif
+                                        </td>
                                         <td class="px-4 py-2 flex items-center space-x-2">
                                             @include('search.action')
                                         </td>
@@ -124,11 +168,11 @@
 
                     <!-- Card view para mobile -->
                     <div class="md:hidden space-y-4">
-                        @foreach ($custodiados as $model)
+                        @foreach ($pessoas as $model)
                             <div class="bg-gray-800 text-gray-200 p-4 rounded-lg shadow-md border border-gray-700">
                                 <div class="flex justify-between mb-1">
-                                    <span class="font-semibold">Id:</span>
-                                    <span>{{ $model->id }}</span>
+                                    <span class="font-semibold">#:</span>
+                                    <span>{{ $loop->iteration }}</span>
                                 </div>
                                 <div class="flex justify-between mb-1">
                                     <span class="font-semibold">Nome:</span>
@@ -140,12 +184,22 @@
                                     <span>{{ $model->alcunha }}</span>
                                 </div>
                                 <div class="flex justify-between mb-1">
-                                    <span class="font-semibold">Regime:</span>
-                                    <span>{{ $model->regime }}</span>
+                                    <span class="font-semibold">Custodiado:</span>
+                                    @if ($custodiado = $model->custodiado)
+                                        <div class="row mt-1 bg-gray-800 p-2 rounded">
+                                            Regime:<BR>
+                                            <span>{{ optional($model->custodiado)->regime?->descricao ?? 'NÃO DEFINIDO' }}</span>
+                                        </div>
+                                        <div class="row mt-1 bg-gray-800 p-2 rounded text-yellow-500">
+                                            Situação:<BR>
+                                            <span>{{ optional($model->custodiado)->situacaoAtual?->descricao }}</span>
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="flex justify-between mb-1">
-                                    <span class="font-semibold">Situação:</span>
-                                    <span>{{ $model->status }}</span>
+                                    <span class="font-semibold">Vinculado:</span>
+                                    <span
+                                        class="text-green-500">{{ optional($model->vinculado)->vinculadoStatus?->descricao ?? 'NÃO' }}</span>
                                 </div>
                                 <div class="flex justify-start mt-2 space-x-2">
                                     @include('search.action')

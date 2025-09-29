@@ -14,9 +14,10 @@ class SearchController extends Controller
     {
         $situacaoAtual = $this->situacaoAtualOpcoes();
         $regimes = $this->regimeOpcoes();
-        $custodiados = $this->search(request());
+        $pessoas = $this->search(request());
         $parametros = request()->all();
+        $tempoExecucao = $this->executionTime;
 
-        return view('search.index', compact('situacaoAtual', 'regimes', 'custodiados', 'parametros'));
+        return view('search.index', compact('situacaoAtual', 'regimes', 'pessoas', 'parametros', 'tempoExecucao'));
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Custodiado\CustodiadoAntigo;
+use App\Models\Custodiado\PessoaAntiga;
 use App\Traits\SearchTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

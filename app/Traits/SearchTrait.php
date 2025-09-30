@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\Custodiado\Custodiado;
 use App\Models\Custodiado\Pessoa;
+use App\Models\Custodiado\PessoaAntiga;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
@@ -61,62 +62,166 @@ trait SearchTrait
         return false;
     }
 
+    // private function getPeople(Request $request)
+    // {
+    //     $start = microtime(true); // inicia cronômetro
+
+    //     $query = Pessoa::query()->select('pessoas.*');
+
+    //     // Join condicional para documentos
+    //     if ($request->filled('documento_tipo_id') || $request->filled('documento_numero')) {
+    //         $query->join('pessoa_documentos as pd', function ($join) {
+    //             $join->on('pessoas.id', '=', 'pd.pessoa_id');
+    //         })
+    //             ->addSelect([
+    //                 'pd.pessoa_id',
+    //                 'pd.documento_tipo_id',
+    //                 'pd.documento_numero',
+    //             ]);
+
+    //         if ($request->filled('documento_tipo_id')) {
+    //             $query->where('pd.documento_tipo_id', $request->documento_tipo_id);
+    //         }
+
+    //         if ($request->filled('documento_numero')) {
+    //             $query->where('pd.documento_numero', $request->documento_numero);
+    //         }
+    //     }
+
+    //     // Join condicional para contatos
+    //     if ($request->filled('contato') || $request->filled('contato_nome')) {
+    //         $query->join('pessoa_contatos as pc', 'pessoas.id', '=', 'pc.pessoa_id');
+
+    //         if ($request->filled('contato')) {
+    //             $query->where('pc.contato', 'like', "%{$request->contato}%");
+    //         }
+
+    //         if ($request->filled('contato_nome')) {
+    //             $query->where('pc.nome', 'like', "%{$request->contato_nome}%");
+    //         }
+    //     }
+
+    //     // Filtro por nome
+    //     if ($request->filled('nome')) {
+    //         $query->where('pessoas.nome', 'like', "%{$request->nome}%");
+    //     }
+
+    //     // Filtro por apelido
+    //     if ($request->filled('apelido')) {
+    //         $query->where('pessoas.alcunha', 'like', "%{$request->apelido}%");
+    //     }
+
+    //     // Ordenação (default: nome)
+    //     $orderBy = $request->order_by ?? 'pessoas.nome';
+    //     $query->orderBy($orderBy);
+
+    //     // Evita duplicados por conta dos joins
+    //     $query->distinct();
+
+    //     // Execução
+    //     $pessoas = $query->get();
+
+    //     $end = microtime(true);
+    //     $executionTime = number_format($end - $start, 4);
+
+    //     $this->executionTime = $executionTime;
+
+    //     return $pessoas;
+    // }
+
     private function getPeople(Request $request)
     {
-        $start = microtime(true); // inicia cronômetro
+        $start = microtime(true);
 
-        $query = Pessoa::query()->select('pessoas.*');
+        // ========================
+        // 1️⃣ Buscar pessoas novas
+        // ========================
+        $queryPessoa = Pessoa::query()
+            ->select('pessoas.*', DB::raw("'nova' as origem"));
 
-        // Join condicional para documentos
-        if ($request->filled('documento_tipo_id') || $request->filled('documento_numero')) {
-            $query->join('pessoa_documentos as pd', 'pessoas.id', '=', 'pd.pessoa_id');
-
-            if ($request->filled('documento_tipo_id')) {
-                $query->where('pd.documento_tipo_id', $request->documento_tipo_id);
-            }
-
-            if ($request->filled('documento_numero')) {
-                $query->where('pd.documento_numero', $request->documento_numero);
-            }
-        }
-
-        // Join condicional para contatos
-        if ($request->filled('contato') || $request->filled('contato_nome')) {
-            $query->join('pessoa_contatos as pc', 'pessoas.id', '=', 'pc.pessoa_id');
-
-            if ($request->filled('contato')) {
-                $query->where('pc.contato', 'like', "%{$request->contato}%");
-            }
-
-            if ($request->filled('contato_nome')) {
-                $query->where('pc.nome', 'like', "%{$request->contato_nome}%");
-            }
-        }
-
-        // Filtro por nome
         if ($request->filled('nome')) {
-            $query->where('pessoas.nome', 'like', "%{$request->nome}%");
+            $queryPessoa->where('pessoas.nome', 'like', "%{$request->nome}%");
         }
 
-        // Filtro por apelido
         if ($request->filled('apelido')) {
-            $query->where('pessoas.alcunha', 'like', "%{$request->apelido}%");
+            $queryPessoa->where('pessoas.alcunha', 'like', "%{$request->apelido}%");
         }
 
-        // Ordenação (default: nome)
-        $orderBy = $request->order_by ?? 'pessoas.nome';
-        $query->orderBy($orderBy);
+        $pessoasNova = $queryPessoa->get();
 
-        // Evita duplicados por conta dos joins
-        $query->distinct();
+        // ========================
+        // 2️⃣ Buscar pessoas antigas (não importadas)
+        // ========================
+        $pessoasAtuaisIds = $pessoasNova->pluck('id')->toArray();
 
-        // Execução
-        $pessoas = $query->get();
+        $queryPessoaAntiga = PessoaAntiga::query()
+            ->select('tbpessoa.*', DB::raw("'antiga' as origem"));
+
+        if (count($pessoasAtuaisIds)) {
+            $queryPessoaAntiga->whereNotIn('tbpessoa.id', $pessoasAtuaisIds);
+        }
+
+        if ($request->filled('nome')) {
+            $queryPessoaAntiga->where('tbpessoa.nome', 'like', "%{$request->nome}%");
+        }
+
+        if ($request->filled('apelido')) {
+            $queryPessoaAntiga->where('tbpessoa.alcunha', 'like', "%{$request->apelido}%");
+        }
+
+        $pessoasAntiga = $queryPessoaAntiga->get();
+
+        // ========================
+        // 3️⃣ União das pessoas (nova antes da antiga)
+        // ========================
+        $pessoas = $pessoasNova->concat($pessoasAntiga)->values();
+        $pessoasIds = $pessoas->pluck('id')->toArray();
+
+        // ========================
+        // 4️⃣ Buscar documentos (somente campos essenciais)
+        // ========================
+        $documentos = DB::connection('siapenweb_dp')
+            ->table('pessoa_documentos')
+            ->select('pessoa_id', 'documento_tipo_id', 'documento_numero') // campos essenciais
+            ->whereIn('pessoa_id', $pessoasIds)
+            ->when($request->filled('documento_tipo_id'), fn($q) => $q->where('documento_tipo_id', $request->documento_tipo_id))
+            ->when($request->filled('documento_numero'), fn($q) => $q->where('documento_numero', $request->documento_numero))
+            ->get()
+            ->groupBy('pessoa_id');
+
+        // ========================
+        // 5️⃣ Buscar contatos (somente campos essenciais)
+        // ========================
+        $contatos = DB::connection('siapenweb_dp')
+            ->table('pessoa_contatos')
+            ->select('pessoa_id', 'contato', 'nome') // campos essenciais
+            ->whereIn('pessoa_id', $pessoasIds)
+            ->when($request->filled('contato'), fn($q) => $q->where('contato', 'like', "%{$request->contato}%"))
+            ->when($request->filled('contato_nome'), fn($q) => $q->where('nome', 'like', "%{$request->contato_nome}%"))
+            ->get()
+            ->groupBy('pessoa_id');
+
+        // ========================
+        // 6️⃣ Anexar documentos e contatos às pessoas
+        // ========================
+        $pessoas = $pessoas->map(function ($pessoa) use ($documentos, $contatos) {
+            $pessoa->documentos = $documentos->get($pessoa->id, collect());
+            $pessoa->contatos = $contatos->get($pessoa->id, collect());
+            return $pessoa;
+        });
+
+        // ========================
+        // 7️⃣ Ordenação final: nova antes da antiga + campo solicitado
+        // ========================
+        $orderBy = $request->order_by ?? 'nome';
+
+        $pessoas = $pessoas->sortBy([
+            fn($p) => $p->origem === 'nova' ? 0 : 1, // nova antes
+            $orderBy,
+        ])->values();
 
         $end = microtime(true);
-        $executionTime = number_format($end - $start, 4);
-
-        $this->executionTime = $executionTime;
+        $this->executionTime = number_format($end - $start, 4);
 
         return $pessoas;
     }

@@ -13,19 +13,19 @@ class PessoaDocumento extends Model
     protected $fillable = [
         'pessoa_id',
         'documento_tipo_id',
-        'expedicao_estado_id',
-        'expedicao_pais_id',
+        // 'expedicao_estado_id',
+        // 'expedicao_pais_id',
         'documento_numero',
-        'frente_img',
-        'frente_img_size',
-        'frente_img_type',
-        'verso_img',
-        'verso_img_size',
-        'verso_img_type',
-        'data_expedicao',
-        'orgao_expedicao',
-        'descricao',
-        'fase_persecucao_id'
+        // 'frente_img',
+        // 'frente_img_size',
+        // 'frente_img_type',
+        // 'verso_img',
+        // 'verso_img_size',
+        // 'verso_img_type',
+        // 'data_expedicao',
+        // 'orgao_expedicao',
+        // 'descricao',
+        // 'fase_persecucao_id'
     ];
 
     function pessoa()

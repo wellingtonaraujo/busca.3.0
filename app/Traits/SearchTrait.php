@@ -46,8 +46,8 @@ trait SearchTrait
         // se a request->all() estiver vazia []
         if (empty(array_filter($request->all()))) return true;
 
-        // se todas as chaves, exceto documento_tipo_id, estiverem nulas
-        $data = $request->except('documento_tipo_id');
+        // pega todos os campos da request
+        $data = $request->all();
 
         $allEmpty = collect($data)->every(function ($value) {
             return is_null($value) || $value === '';
@@ -62,163 +62,98 @@ trait SearchTrait
         return false;
     }
 
-    // private function getPeople(Request $request)
-    // {
-    //     $start = microtime(true); // inicia cronômetro
-
-    //     $query = Pessoa::query()->select('pessoas.*');
-
-    //     // Join condicional para documentos
-    //     if ($request->filled('documento_tipo_id') || $request->filled('documento_numero')) {
-    //         $query->join('pessoa_documentos as pd', function ($join) {
-    //             $join->on('pessoas.id', '=', 'pd.pessoa_id');
-    //         })
-    //             ->addSelect([
-    //                 'pd.pessoa_id',
-    //                 'pd.documento_tipo_id',
-    //                 'pd.documento_numero',
-    //             ]);
-
-    //         if ($request->filled('documento_tipo_id')) {
-    //             $query->where('pd.documento_tipo_id', $request->documento_tipo_id);
-    //         }
-
-    //         if ($request->filled('documento_numero')) {
-    //             $query->where('pd.documento_numero', $request->documento_numero);
-    //         }
-    //     }
-
-    //     // Join condicional para contatos
-    //     if ($request->filled('contato') || $request->filled('contato_nome')) {
-    //         $query->join('pessoa_contatos as pc', 'pessoas.id', '=', 'pc.pessoa_id');
-
-    //         if ($request->filled('contato')) {
-    //             $query->where('pc.contato', 'like', "%{$request->contato}%");
-    //         }
-
-    //         if ($request->filled('contato_nome')) {
-    //             $query->where('pc.nome', 'like', "%{$request->contato_nome}%");
-    //         }
-    //     }
-
-    //     // Filtro por nome
-    //     if ($request->filled('nome')) {
-    //         $query->where('pessoas.nome', 'like', "%{$request->nome}%");
-    //     }
-
-    //     // Filtro por apelido
-    //     if ($request->filled('apelido')) {
-    //         $query->where('pessoas.alcunha', 'like', "%{$request->apelido}%");
-    //     }
-
-    //     // Ordenação (default: nome)
-    //     $orderBy = $request->order_by ?? 'pessoas.nome';
-    //     $query->orderBy($orderBy);
-
-    //     // Evita duplicados por conta dos joins
-    //     $query->distinct();
-
-    //     // Execução
-    //     $pessoas = $query->get();
-
-    //     $end = microtime(true);
-    //     $executionTime = number_format($end - $start, 4);
-
-    //     $this->executionTime = $executionTime;
-
-    //     return $pessoas;
-    // }
-
     private function getPeople(Request $request)
     {
         $start = microtime(true);
 
-        // ========================
-        // 1️⃣ Buscar pessoas novas
-        // ========================
-        $queryPessoa = Pessoa::query()
-            ->select('pessoas.*', DB::raw("'nova' as origem"));
+        // 1️⃣ Pessoas novas
+        $pessoasNova = Pessoa::query()
+            ->select('pessoas.*', DB::raw("'nova' as origem"))
+            ->when($request->filled('nome'), fn($q) => $q->where('pessoas.nome', 'like', "%{$request->nome}%"))
+            ->when($request->filled('apelido'), fn($q) => $q->where('pessoas.alcunha', 'like', "%{$request->apelido}%"))
+            ->get()
+            ->map(fn($p) => tap($p, fn($pessoa) => $pessoa->id_formatado = $pessoa->id . 'N'));
 
-        if ($request->filled('nome')) {
-            $queryPessoa->where('pessoas.nome', 'like', "%{$request->nome}%");
-        }
+        // 2️⃣ Pessoas antigas
+        // 2️⃣ Pessoas antigas
+        $nomesNovas = $pessoasNova->pluck('nome')->toArray();
 
-        if ($request->filled('apelido')) {
-            $queryPessoa->where('pessoas.alcunha', 'like', "%{$request->apelido}%");
-        }
+        $pessoasAntiga = PessoaAntiga::query()
+            ->from('siapen.tbpessoa as tbpessoa')
+            ->select('tbpessoa.*', DB::raw("'antiga' as origem"))
+            ->when(!empty($nomesNovas), fn($q) => $q->whereNotIn('tbpessoa.nome', $nomesNovas))
+            ->when(
+                $request->filled('nome'),
+                fn($q) =>
+                $q->where('tbpessoa.nome', 'like', "%{$request->nome}%")
+            )
+            // 🔍 Apenas se a requisição tiver 'apelido', faz o join com interno
+            ->when($request->filled('apelido'), function ($q) use ($request) {
+                $q->join('siapen.interno as interno', 'interno.idpessoa', '=', 'tbpessoa.id')
+                    ->addSelect('interno.alcunha')
+                    ->where('interno.alcunha', 'like', "%{$request->apelido}%");
+            })
+            ->get()
+            ->map(fn($p) => tap($p, fn($pessoa) => $pessoa->id_formatado = $pessoa->id . 'A'));
 
-        $pessoasNova = $queryPessoa->get();
 
-        // ========================
-        // 2️⃣ Buscar pessoas antigas (não importadas)
-        // ========================
-        $pessoasAtuaisIds = $pessoasNova->pluck('id')->toArray();
-
-        $queryPessoaAntiga = PessoaAntiga::query()
-            ->select('tbpessoa.*', DB::raw("'antiga' as origem"));
-
-        if (count($pessoasAtuaisIds)) {
-            $queryPessoaAntiga->whereNotIn('tbpessoa.id', $pessoasAtuaisIds);
-        }
-
-        if ($request->filled('nome')) {
-            $queryPessoaAntiga->where('tbpessoa.nome', 'like', "%{$request->nome}%");
-        }
-
-        if ($request->filled('apelido')) {
-            $queryPessoaAntiga->where('tbpessoa.alcunha', 'like', "%{$request->apelido}%");
-        }
-
-        $pessoasAntiga = $queryPessoaAntiga->get();
-
-        // ========================
-        // 3️⃣ União das pessoas (nova antes da antiga)
-        // ========================
+        // 3️⃣ Junta pessoas
         $pessoas = $pessoasNova->concat($pessoasAntiga)->values();
-        $pessoasIds = $pessoas->pluck('id')->toArray();
 
-        // ========================
-        // 4️⃣ Buscar documentos (somente campos essenciais)
-        // ========================
-        $documentos = DB::connection('siapenweb_dp')
+        // 4️⃣ IDs separados
+        $idsNovas   = $pessoasNova->pluck('id')->toArray();
+        $idsAntigas = $pessoasAntiga->pluck('id')->toArray();
+
+        // 5️⃣ Documentos novas
+        $documentosNovas = DB::connection('siapenweb_dp')
             ->table('pessoa_documentos')
-            ->select('pessoa_id', 'documento_tipo_id', 'documento_numero') // campos essenciais
-            ->whereIn('pessoa_id', $pessoasIds)
-            ->when($request->filled('documento_tipo_id'), fn($q) => $q->where('documento_tipo_id', $request->documento_tipo_id))
+            ->select('pessoa_id', 'documento_tipo_id', 'documento_numero')
+            ->whereIn('pessoa_id', $idsNovas)
             ->when($request->filled('documento_numero'), fn($q) => $q->where('documento_numero', $request->documento_numero))
             ->get()
             ->groupBy('pessoa_id');
 
-        // ========================
-        // 5️⃣ Buscar contatos (somente campos essenciais)
-        // ========================
-        $contatos = DB::connection('siapenweb_dp')
+        // 6️⃣ Documentos antigas
+        $documentosAntigas = DB::connection('siapen')
+            ->table('pessoa_documento')
+            ->select('idpessoa', 'iddocumento as documento_tipo_id', 'numero_documento as documento_numero', 'orgao_expedidor', 'data_expedicao', 'uf_documento', 'pais_documento')
+            ->whereIn('idpessoa', $idsAntigas)
+            ->when($request->filled('documento_numero'), fn($q) => $q->where('numero_documento', $request->documento_numero))
+            ->get()
+            ->groupBy('idpessoa');
+
+        // 7️⃣ Contatos novas
+        $contatosNovas = DB::connection('siapenweb_dp')
             ->table('pessoa_contatos')
-            ->select('pessoa_id', 'contato', 'nome') // campos essenciais
-            ->whereIn('pessoa_id', $pessoasIds)
+            ->select('pessoa_id', 'contato', 'nome')
+            ->whereIn('pessoa_id', $idsNovas)
             ->when($request->filled('contato'), fn($q) => $q->where('contato', 'like', "%{$request->contato}%"))
-            ->when($request->filled('contato_nome'), fn($q) => $q->where('nome', 'like', "%{$request->contato_nome}%"))
             ->get()
             ->groupBy('pessoa_id');
 
-        // ========================
-        // 6️⃣ Anexar documentos e contatos às pessoas
-        // ========================
-        $pessoas = $pessoas->map(function ($pessoa) use ($documentos, $contatos) {
-            $pessoa->documentos = $documentos->get($pessoa->id, collect());
-            $pessoa->contatos = $contatos->get($pessoa->id, collect());
+        // 8️⃣ Contatos antigas
+        $contatosAntigas = DB::connection('siapen')
+            ->table('pessoa_contato')
+            ->select('idpessoa as pessoa_id', 'idtipo_contato as contato_tipo_id', 'contato')
+            ->whereIn('idpessoa', $idsAntigas)
+            ->when($request->filled('contato'), fn($q) => $q->where('contato', 'like', "%{$request->contato}%"))
+            ->get()
+            ->groupBy('pessoa_id');
+
+        // 9️⃣ Anexar docs + contatos conforme origem
+        $pessoas = $pessoas->map(function ($pessoa) use ($documentosNovas, $documentosAntigas, $contatosNovas, $contatosAntigas) {
+            if ($pessoa->origem === 'nova') {
+                $pessoa->documentos = $documentosNovas->get($pessoa->id, collect());
+                $pessoa->contatos   = $contatosNovas->get($pessoa->id, collect());
+            } else {
+                $pessoa->documentos = $documentosAntigas->get($pessoa->id, collect());
+                $pessoa->contatos   = $contatosAntigas->get($pessoa->id, collect());
+            }
             return $pessoa;
         });
 
-        // ========================
-        // 7️⃣ Ordenação final: nova antes da antiga + campo solicitado
-        // ========================
-        $orderBy = $request->order_by ?? 'nome';
-
-        $pessoas = $pessoas->sortBy([
-            fn($p) => $p->origem === 'nova' ? 0 : 1, // nova antes
-            $orderBy,
-        ])->values();
+        // 🔟 Ordenação final
+        $pessoas = $pessoas->sortBy(fn($p) => [$p->origem === 'nova' ? 0 : 1, $p->nome])->values();
 
         $end = microtime(true);
         $this->executionTime = number_format($end - $start, 4);

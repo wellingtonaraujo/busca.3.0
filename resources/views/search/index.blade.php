@@ -23,22 +23,16 @@
 
             <!-- Formulário -->
             <form action="{{ route('search') }}" method="GET">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <x-form-input-text name="nome" placeholder="Nome" :value="$parametros['nome'] ?? ''" />
-                    <x-form-input-text name="apelido" placeholder="Apelido / Codnome" :value="$parametros['apelido'] ?? ''" />
-                    <x-form-input-select name="documento_tipo_id" :options="[1 => 'Carteira de Identidade', 2 => 'CPF - Cadastro de pessoa física']" placeholder="Tipo de documento"
-                        :value="null" :value="$parametros['documento_tipo_id'] ?? 2" />
-                    <x-form-input-text name="documento_numero" placeholder="Número do documento" :value="$parametros['documento_numero'] ?? ''" />
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <x-form-input-text name="nome" placeholder="Nome" :value="$parametros['nome'] ?? ''" title="Nome a ser pesquisado"/>
+                    <x-form-input-text name="apelido" placeholder="Apelido / Codnome" :value="$parametros['apelido'] ?? ''" title="Apelido da pessoa" />
+                    {{-- <x-form-input-select name="documento_tipo_id" :options="[1 => 'Carteira de Identidade', 2 => 'CPF - Cadastro de pessoa física']" placeholder="Tipo de documento"
+                        :value="null" :value="$parametros['documento_tipo_id'] ?? 2" /> --}}
+                    <x-form-input-text name="documento_numero" placeholder="Número do documento" :value="$parametros['documento_numero'] ?? ''" title="Número do documento. Ex: cpf, rg, ctps, cnh..." />
                     {{-- <x-form-input-text name="rg_num" placeholder="Nº RG (Só números)" :value="$parametros['rg_num'] ?? ''" /> --}}
-                    <x-form-input-text name="contato" placeholder="Contato (Só números)" :value="$parametros['contato'] ?? ''" />
-                    <x-form-input-text name="contato_nome" placeholder="Nome do contato (Ex. Nome da Mãe)"
-                        :value="$parametros['contato_nome'] ?? ''" />
-                    {{-- <x-form-input-select name="regime_id" :options="$regimes" placeholder="Regime de prisão"
-                        :value="$parametros['regime_id'] ?? ''" />
-                    <x-form-input-select name="custodiado_situacao_atual_id" :options="$situacaoAtual"
-                        placeholder="Situação pricional" :value="null" :value="$parametros['custodiado_situacao_atual_id'] ?? ''" />
-                    <x-form-input-select name="order_by" :options="['id' => 'Id da pessoa', 'nome' => 'Nome da pessoa', 'regime' => 'Situação']" placeholder="Ordenar por..."
-                        :value="null" :value="$parametros['order_by'] ?? ''" /> --}}
+                    <x-form-input-text name="contato" placeholder="Contato (Só números)" :value="$parametros['contato'] ?? ''" title="Número do contato. Ex. celular, telefone fixo..."/>
+                    {{-- <x-form-input-text name="contato_nome" placeholder="Obs do contato (Ex. Nome da Mãe)" --}}
+                        {{-- :value="$parametros['contato_nome'] ?? ''" /> --}}
                 </div>
 
                 <!-- Botões -->

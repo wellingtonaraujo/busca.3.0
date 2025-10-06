@@ -2,6 +2,8 @@
 
 namespace App\Models\Custodiado;
 
+use App\Models\Adm\Estado;
+use App\Models\Adm\Pais;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,19 +15,12 @@ class PessoaDocumento extends Model
     protected $fillable = [
         'pessoa_id',
         'documento_tipo_id',
-        // 'expedicao_estado_id',
-        // 'expedicao_pais_id',
+        'expedicao_estado_id',
+        'expedicao_pais_id',
         'documento_numero',
-        // 'frente_img',
-        // 'frente_img_size',
-        // 'frente_img_type',
-        // 'verso_img',
-        // 'verso_img_size',
-        // 'verso_img_type',
-        // 'data_expedicao',
-        // 'orgao_expedicao',
-        // 'descricao',
-        // 'fase_persecucao_id'
+        'data_expedicao',
+        'orgao_expedicao',
+        'descricao',
     ];
 
     function pessoa()
@@ -33,28 +28,33 @@ class PessoaDocumento extends Model
         return $this->hasOne(Pessoa::class, 'id', 'pessoa_id');
     }
 
-    private function estado()
-    {
-        // return $this->hasOne(Estado::class, 'id', 'expedicao_estado_id');
+    public function getDocumentoTipoAttribute(){
+        $tipo = DocumentoTipo::find($this->documento_tipo_id);
+        return $tipo->abreviatura;
     }
 
-    function pais()
-    {
-        // return $this->hasOne(Pais::class, 'id', 'expedicao_pais_id');
+    public function  getExpedicaoEstadoAttribute(){
+        $estado = Estado::find($this->expedicao_estado_id);
+        return optional($estado)->sigla;
     }
 
-    function documentoTipo()
+    public function getExpedicaoPaisAttribute(){
+        $pais = Pais::find($this->expedicao_pais_id);
+        return optional($pais)->sigla;
+    }
+
+    // public function estado()
+    // {
+    //     return $this->hasOne(Estado::class, 'id', 'expedicao_estado_id');
+    // }
+
+    // public function pais()
+    // {
+    //     return $this->hasOne(Pais::class, 'id', 'expedicao_pais_id');
+    // }
+
+    public function documentoTipo()
     {
         return $this->hasOne(DocumentoTipo::class, 'id', 'documento_tipo_id');
     }
-
-    // public function nomeEstadoExpedicao()
-    // {
-    //     try {
-    //         $estado = $this->estado()->first();
-    //         return $estado->nome;
-    //     } catch (\Throwable $th) {
-    //         return "INDISPONÍVEL";
-    //     }
-    // }
 }

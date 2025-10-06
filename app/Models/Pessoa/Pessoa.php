@@ -2,6 +2,7 @@
 
 namespace App\Models\Pessoa;
 
+use App\Models\Custodiado\PessoaDocumento;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -39,5 +40,11 @@ class Pessoa extends Model
     public function user()
     {
         return $this->hasOne(User::class, 'pessoa_id', 'id');
+    }
+
+    public function documentos()
+    {
+        return $this->hasMany(PessoaDocumento::class, 'pessoa_id', 'id')
+            ->select(['id', 'pessoa_id', 'documento_tipo_id', 'documento_numero']);
     }
 }

@@ -5,14 +5,13 @@ namespace App\Models\Custodiado;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Regime extends Model
+class GeralDocumento extends Model
 {
     use HasFactory;
-    protected $connection = 'siapenweb_dp';
-    protected $table = 'regimes';
+    protected $connection = 'siapen';
+    protected $table = 'geral_documento';
     protected $fillable = [
-        'idprisao_regime',
-        'descricao',
-        'geral_status_id',
+        'iddocumento',
+        'docuemto',
     ];
 }

@@ -18,7 +18,7 @@ class SearchController extends Controller
     {
         $situacaoAtual = $this->situacaoAtualOpcoes();
         $regimes = $this->regimeOpcoes();
-        $pessoas = $this->search(request());
+        $pessoas = $this->searchPeoples(request());
         $parametros = request()->all();
         $tempoExecucao = $this->executionTime;
 

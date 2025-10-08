@@ -168,31 +168,27 @@ trait SearchTrait
 
     public function searchPeoples(Request $request)
     {
+        // retorna null se a $request->all() retiver vazia;
+        if ($this->requestEmpty($request)) {
+            return null;
+        }
+
         $start = microtime(true);
         $this->documentosNovos = $this->documentosAntigos = $this->contatosNovos = $this->contatosAntigos = [];
-
-        if ($request->filled('documento_numero')) {
-            $this->getDocumentos($request->documento_numero);
-        }
-
-        if ($request->filled('contato')) {
-            $this->getContatos($request->contato);
-        }
-
-        $pessoasNovasIds = array_unique(
-            array_merge($this->contatosNovos, $this->documentosNovos)
-        );
-
-        $pessoasAntigasIds = array_unique(
-            array_merge($this->contatosAntigos, $this->documentosAntigos)
-        );
 
         // 1️⃣ Pessoas novas
         $pessoasNova = Pessoa::query()
             ->select('pessoas.*', DB::raw("'nova' as origem"))
             ->when($request->filled('nome'), fn($q) => $q->where('pessoas.nome', 'like', "%{$request->nome}%"))
             ->when($request->filled('apelido'), fn($q) => $q->where('pessoas.alcunha', 'like', "%{$request->apelido}%"))
-            ->whereIn('id', $pessoasNovasIds)
+            ->where(function ($query) {
+                $query->whereHas('custodiado')
+                    ->orWhereHas('vinculado');
+            })
+            ->where(function ($query) {
+                $query->whereHas('documentos')
+                    ->orWhereHas('contatos');
+            })
             ->get()
             ->map(fn($p) => tap($p, fn($pessoa) => $pessoa->id_formatado = $pessoa->id . 'N'));
 
@@ -213,13 +209,45 @@ trait SearchTrait
                     ->addSelect('interno.alcunha')
                     ->where('interno.alcunha', 'like', "%{$request->apelido}%");
             })
-            ->whereIn('id', $pessoasAntigasIds)
+            // ->where(function ($query) {
+            //     $query->whereHas('custodiadoAntigo')
+            //         ->orWhereHas('internoVisitante');
+            // })
+            ->where(function ($query) {
+                $query->whereHas('documentos')
+                    ->orWhereHas('contatos');
+            })
             ->get()
             ->map(fn($p) => tap($p, fn($pessoa) => $pessoa->id_formatado = $pessoa->id . 'A'));
 
+        if ($request->filled('documento_numero')) {
+            $this->getDocumentos($request->documento_numero);
+        } else {
+            $this->getDocumentos(null, $pessoasNova->pluck('id')->toArray(), $pessoasAntiga->pluck('id')->toArray());
+        }
+
+        if ($request->filled('contato')) {
+            $this->getContatos($request->contato);
+        } else {
+            $this->getContatos(null, $pessoasNova->pluck('id')->toArray(), $pessoasAntiga->pluck('id')->toArray());
+        }
+
+        $pessoasNovasIds = array_unique(
+            array_merge($this->contatosNovos, $this->documentosNovos)
+        );
+
+        $pessoasAntigasIds = array_unique(
+            array_merge($this->contatosAntigos, $this->documentosAntigos)
+        );
+
+        $pessoasNovas = $pessoasNova
+            ->whereIn('id', $pessoasNovasIds);
+
+        $pessoasAntigas = $pessoasAntiga->whereIn('id', $pessoasAntigasIds);
 
         // 3️⃣ Junta pessoas
-        $pessoas = $pessoasNova->concat($pessoasAntiga)->values();
+        $pessoas = $pessoasNovas->concat($pessoasAntigas)->values();
+
         $documentosNovas = $this->pessoasDocumentosNovos();
         $documentosAntigas = $this->pessoaDocumentosAntigos();
         $contatosNovas = $this->pessoaContatosNovos();
@@ -299,20 +327,33 @@ trait SearchTrait
         return $contatosAntigas;
     }
 
-
-    public function getContatos($contato)
+    public function getContatos($contato = null, $pessoasNovasIds, $pessoasAntigasIds)
     {
-        $this->contatosNovos = DB::connection('siapenweb_dp')
-            ->table('pessoa_contatos')
-            ->where('contato', 'like', "%" . $contato . "%")
-            ->pluck('pessoa_id')
-            ->toArray();
+        if (!is_null($contato)) {
+            $this->contatosNovos = DB::connection('siapenweb_dp')
+                ->table('pessoa_contatos')
+                ->where('contato', 'like', "%" . $contato . "%")
+                ->pluck('pessoa_id')
+                ->toArray();
 
-        $this->contatosAntigos = DB::connection('siapen')
-            ->table('pessoa_contato')
-            ->where('contato', 'like', "%" . $contato . "%")
-            ->pluck('idpessoa')
-            ->toArray();
+            $this->contatosAntigos = DB::connection('siapen')
+                ->table('pessoa_contato')
+                ->where('contato', 'like', "%" . $contato . "%")
+                ->pluck('idpessoa')
+                ->toArray();
+        } else {
+            $this->contatosNovos = DB::connection('siapenweb_dp')
+                ->table('pessoa_contatos')
+                ->whereIn('pessoa_id', $pessoasNovasIds)
+                ->pluck('pessoa_id')
+                ->toArray();
+
+            $this->contatosAntigos = DB::connection('siapen')
+                ->table('pessoa_contato')
+                ->whereIn('idpessoa', $pessoasAntigasIds)
+                ->pluck('idpessoa')
+                ->toArray();
+        }
 
         $pessoasIds = Pessoa::whereIn('idpessoa', $this->contatosAntigos)->pluck('id', 'idpessoa')->toArray();
 
@@ -330,21 +371,37 @@ trait SearchTrait
         }
     }
 
-    public function getDocumentos($documento_numero)
+    public function getDocumentos($documento_numero, $pessoasNovasIds = null, $pessoasAntigasIds = null)
     {
-        $this->documentosNovos = DB::connection('siapenweb_dp')
-            ->table('pessoa_documentos')
-            ->where('documento_numero', 'like', "%" . $documento_numero . "%")
-            ->whereNotNull('documento_numero')
-            ->pluck('pessoa_id')
-            ->toArray();
+        if (!is_null($documento_numero)) {
+            $this->documentosNovos = DB::connection('siapenweb_dp')
+                ->table('pessoa_documentos')
+                ->where('documento_numero', 'like', "%" . $documento_numero . "%")
+                ->whereNotNull('documento_numero')
+                ->pluck('pessoa_id')
+                ->toArray();
 
-        $this->documentosAntigos = DB::connection('siapen')
-            ->table('pessoa_documento')
-            ->where('numero_documento', 'like', "%" . $documento_numero . "%")
-            ->whereNotNull('numero_documento')
-            ->pluck('idpessoa')
-            ->toArray();
+            $this->documentosAntigos = DB::connection('siapen')
+                ->table('pessoa_documento')
+                ->where('numero_documento', 'like', "%" . $documento_numero . "%")
+                ->whereNotNull('numero_documento')
+                ->pluck('idpessoa')
+                ->toArray();
+        } else {
+            $this->documentosNovos = DB::connection('siapenweb_dp')
+                ->table('pessoa_documentos')
+                ->whereIn('pessoa_id', $pessoasNovasIds)
+                ->whereNotNull('documento_numero')
+                ->pluck('pessoa_id')
+                ->toArray();
+
+            $this->documentosAntigos = DB::connection('siapen')
+                ->table('pessoa_documento')
+                ->whereIn('idpessoa', $pessoasAntigasIds)
+                ->whereNotNull('numero_documento')
+                ->pluck('idpessoa')
+                ->toArray();
+        }
 
         $pessoasIds = Pessoa::whereIn('idpessoa', $this->documentosAntigos)->pluck('id', 'idpessoa')->toArray();
 

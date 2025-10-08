@@ -54,13 +54,6 @@ class PessoaAntiga extends Model
         );
     }
 
-    // 🔹 Se quiser juntar os dois papéis em um só accessor
-    public function getTodosVinculadosAttribute()
-    {
-        return $this->vinculadosComoVisitante
-            ->merge($this->vinculadosComoInterno);
-    }
-
     // 🔹 Se quiser unificar em um só
     public function vinculadoAntigo()
     {
@@ -68,7 +61,25 @@ class PessoaAntiga extends Model
             ->merge($this->vinculadosComoInterno()->get());
     }
 
-    public function pessoaDocumentoAntigo(){
+    // 🔹 Se quiser juntar os dois papéis em um só accessor
+    public function getTodosVinculadosAttribute()
+    {
+        return $this->vinculadosComoVisitante
+            ->merge($this->vinculadosComoInterno);
+    }
+
+    public function documentos()
+    {
         return $this->hasMany(PessoaDocumentoAntigo::class, 'idpessoa', 'id');
+    }
+
+    public function contatos()
+    {
+        return $this->hasMany(PessoaContatoAntigo::class, 'idpessoa', 'id');
+    }
+
+    public function internoVisitante()
+    {
+        return $this->hasOne(InternoVisitante::class, 'idvisitante', 'id');
     }
 }

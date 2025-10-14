@@ -1,8 +1,8 @@
-<table class="min-w-[600px] w-full text-sm text-left border-collapse">
+<table class="min-w-[720px] w-full text-sm text-left border-collapse">
     <thead class="bg-gray-800 text-gray-200 border-b border-gray-700">
         <tr>
             <th class="px-4 py-2 font-semibold">#</th>
-            <th class="px-4 py-2 font-semibold">Id</th>
+            <th class="px-4 py-2 font-semibold">ID</th>
             <th class="px-4 py-2 font-semibold">Nome</th>
             <th class="px-4 py-2 font-semibold">Alcunha</th>
             <th class="px-4 py-2 font-semibold">Contato</th>
@@ -12,74 +12,76 @@
         </tr>
     </thead>
     <tbody>
-        @foreach ($pessoas as $model)
-            <tr class="border-b border-gray-800 hover:bg-gray-700 transition-colors">
-                <td class="px-4 py-2 align-top">{{ $loop->iteration }}</td>
-                <td class="px-4 py-2 align-top">{{ $model->id_formatado }}</td>
-                <td class="px-4 py-2 truncate max-w-xs align-top" title="{{ $model->nome }}">
-                    {{ $model->nome }}</td>
-                <td class="px-4 py-2 align-top">
-                    @if (is_null($model->alcunha) || empty($model->alcunha))
-                        <span class="text-2xl text-red-500">-</span>
+        @forelse ($pessoas as $model)
+            @php
+                $custodiado = $model->origem === 'nova'
+                    ? ($model->custodiado ?? null)
+                    : (!empty($model->custodiadoAntigo) ? $model->custodiadoAntigo : null);
+
+                $contatos = $model->contatos ?? collect();
+                $documentos = $model->documentos ?? collect();
+            @endphp
+
+            <tr class="border-b border-gray-800 hover:bg-gray-700 transition-colors align-top">
+                <td class="px-4 py-2">{{ $loop->iteration }}</td>
+                <td class="px-4 py-2">{{ $model->id_formatado }}</td>
+
+                <td class="px-4 py-2 max-w-xs">
+                    <span class="truncate block" title="{{ $model->nome }}">{{ $model->nome }}</span>
+                </td>
+
+                <td class="px-4 py-2">
+                    @if (blank($model->alcunha))
+                        <span class="text-2xl leading-none text-red-500">-</span>
                     @else
                         {{ $model->alcunha }}
                     @endif
                 </td>
-                <td class="px-4 py-2 align-top text-left">
-                    @if ($contatos = $model->contatos)
 
-                        @foreach ($contatos as $contato)
-                            {{-- <div class="mt-1 bg-gray-800 p-2 rounded text-yellow-300"> --}}
-                                @if (isset($contato->nome))
-                                    @if (!is_null($contato->nome))
-                                        ({{ optional($contato)->vinculadoTipo?->descricao }})
-                                        {{ $contato->nome }}
-                                    @endif
-                                    <strong class="text-yellow-300">{{ $contato->contato }}</strong>
-                                @else
-                                    <strong class="text-yellow-300">{{ $contato->contato }}</strong>
-                                @endif
-                            {{-- </div> --}}
-                        @endforeach
-                    @else
-                        Nenhum
-                    @endif
+                {{-- Contatos --}}
+                <td class="px-4 py-2">
+                    @forelse ($contatos as $c)
+                        <div class="mt-1">
+                            @if (!is_null($c->nome ?? null))
+                                <span class="text-gray-300">
+                                    ({{ optional($c->vinculadoTipo)->descricao }}) {{ $c->nome }}
+                                </span>
+                            @endif
+                            <strong class="text-yellow-300 block">{{ $c->contato }}</strong>
+                        </div>
+                    @empty
+                        <span class="text-gray-400">Nenhum</span>
+                    @endforelse
                 </td>
 
-                <td class="px-4 py-2 align-top text-left">
-                    @if ($documentos = $model->documentos)
-                        @foreach ($documentos as $documento)
-                            <p>{{ getDocumento($documento, $model->origem)}}</p>
-                        @endforeach
-                    @endif
+                {{-- Documentos --}}
+                <td class="px-4 py-2">
+                    @forelse ($documentos as $doc)
+                        <p>{{ $doc->documentoTipo }} {{ $model->origem == 'nova' ? $doc->documento_numero : $doc->numero_documento }}</p>
+                    @empty
+                        <span class="text-gray-400">—</span>
+                    @endforelse
                 </td>
 
-                <td class="px-4 py-2 align-top">
-                    @if ($model->origem == 'nova')
-                        @php
-                            $custodiado = $model->custodiado;
-                        @endphp
-                    @else
-                        @php
-                            $custodiado = !empty($model->custodiadoAntigo) ? $model->custodiadoAntigo : false;
-                        @endphp
-                    @endif
-
+                {{-- Custodiado --}}
+                <td class="px-4 py-2">
                     @if ($custodiado)
-                        @if (!is_null($custodiado->regime))
-                            {{ optional($custodiado)->regime?->descricao }}<br>
-                        @endif
-                        @if (!is_null($custodiado->situacaoAtual))
-                            {{ optional($custodiado)->situacaoAtual?->descricao }}
-                        @endif
-                    @else
-                        <span class="text-2xl text-red-500">-</span>
+                        <p>Regime: {{ optional($custodiado->regime)->descricao ?? 'NÃO DEFINIDO' }}</p>
+                        Situação: {{ optional($custodiado->situacaoAtual)->descricao ?? 'NÃO DEFINIDO' }}
                     @endif
                 </td>
-                <td class="px-4 py-2 flex items-center space-x-2">
-                    @include('search.action')
+
+                {{-- Ações --}}
+                <td class="px-4 py-2">
+                    <div class="flex items-center gap-2">
+                        @include('search.action', ['model' => $model])
+                    </div>
                 </td>
             </tr>
-        @endforeach
+        @empty
+            <tr>
+                <td colspan="8" class="px-4 py-6 text-center text-gray-400">Nenhum registro encontrado.</td>
+            </tr>
+        @endforelse
     </tbody>
 </table>

@@ -17,8 +17,7 @@ trait SearchTrait
             return null;
         }
 
-        $pessoas = $this->searchPeoples($request);
-        return $pessoas;
+        return $this->searchPeoples($request);;
     }
 
     private function requestEmpty(Request $request)

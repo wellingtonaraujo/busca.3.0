@@ -16,10 +16,11 @@ class SearchController extends Controller
     //meto do index
     public function index()
     {
-        $pessoas = $this->search(request());
+        $resultado = $this->search(request());
+        $pessoas = $resultado['data'];
+        $tempo_execucao = $resultado['tempo_execucao'];
         $parametros = request()->all();
-        // $tempoExecucao = $this->executionTime;
 
-        return view('search.index', compact('pessoas', 'parametros'));
+        return view('search.index', compact('pessoas', 'parametros', 'tempo_execucao'));
     }
 }

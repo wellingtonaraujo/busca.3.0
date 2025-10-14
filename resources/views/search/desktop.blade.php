@@ -14,10 +14,8 @@
     <tbody>
         @forelse ($pessoas as $model)
             @php
-                $custodiado = $model->origem === 'nova'
-                    ? ($model->custodiado ?? null)
-                    : (!empty($model->custodiadoAntigo) ? $model->custodiadoAntigo : null);
-
+                $custodiado = $model->custodiado;
+                $custodiado_id = optional( $model->custodiado)->id ?? null;
                 $contatos = $model->contatos ?? collect();
                 $documentos = $model->documentos ?? collect();
             @endphp
@@ -74,7 +72,7 @@
                 {{-- Ações --}}
                 <td class="px-4 py-2">
                     <div class="flex items-center gap-2">
-                        @include('search.action', ['model' => $model])
+                        @include('search.action', ['model'=>$model, 'custodiado_id'=>optional($model->custodiado)->id ?? null, 'origem'=>$model->origem])
                     </div>
                 </td>
             </tr>

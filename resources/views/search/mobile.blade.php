@@ -1,8 +1,11 @@
 @forelse ($pessoas as $model)
     @php
-        $custodiado = $model->origem === 'nova'
-            ? ($model->custodiado ?? null)
-            : (!empty($model->custodiadoAntigo) ? $model->custodiadoAntigo : null);
+        $custodiado =
+            $model->origem === 'nova'
+                ? $model->custodiado ?? null
+                : (!empty($model->custodiadoAntigo)
+                    ? $model->custodiadoAntigo
+                    : null);
 
         $contatos = $model->contatos ?? collect();
     @endphp
@@ -20,25 +23,16 @@
 
         <div class="flex justify-between mb-1">
             <span class="font-semibold">Alcunha:</span>
-            <span>{{ $model->alcunha ?? '—' }}</span>
+            <span>{{ optional($model)->alcunha ?? '--'}}</span>
         </div>
 
-        <div class="mb-1">
+        <div class="flex justify-between mb-1">
             <span class="font-semibold">Contato:</span>
-            @forelse ($contatos as $c)
-                <div class="mt-2">
-                    @if (!is_null($c->nome ?? null))
-                        <div class="text-gray-300 text-xs">
-                            ({{ optional($c->vinculadoTipo)->descricao }}) {{ $c->nome }}
-                        </div>
-                    @endif
-                    <div class="mt-1 bg-gray-700/70 p-2 rounded text-yellow-300 w-full">
-                        <strong>{{ $c->contato }}</strong>
-                    </div>
-                </div>
-            @empty
-                <div class="text-gray-400">Nenhum</div>
-            @endforelse
+                @forelse ($contatos as $c)
+                    <strong class="text-yellow-300 block">{{ $c->contato }}</strong>
+                @empty
+                    -
+                @endforelse
         </div>
 
         <div class="mt-2">

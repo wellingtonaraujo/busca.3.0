@@ -23,4 +23,8 @@ class SearchController extends Controller
 
         return view('search.index', compact('pessoas', 'parametros', 'tempo_execucao'));
     }
+
+    public function consultaPrisional(Request $request){
+        dd($request->all());
+    }
 }

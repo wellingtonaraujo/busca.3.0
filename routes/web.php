@@ -50,5 +50,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/pessoas/{id}/cpf', [PessoaController::class, 'getCPF'])->name('pessoas.getCPF');
         Route::get('/pessoas/{pessoa}/usuario', [PessoaController::class, 'usuario'])->name('pessoas.usuario');
         Route::get('/audit', [AuditController::class, 'index'])->name('audit.index');
+        Route::post('consultaPrisional', [SearchController::class, 'consultaPrisional'])->name('consultaPrisional');
     });
 });

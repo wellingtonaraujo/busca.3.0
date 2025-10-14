@@ -25,4 +25,8 @@ class PessoaContatoAntigo extends Model
     public function tipoContato(){
         return $this->hasOne(GeralTipoContato::class, 'idtipo_contato', 'idtipo_contato');
     }
+
+    public function vinculadoTipo(){
+        return $this->hasOne(VinculadoTipo::class, 'id', 'vinculado_tipo_id');
+    }
 }

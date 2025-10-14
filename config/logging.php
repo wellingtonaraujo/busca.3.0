@@ -126,6 +126,13 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'dbguard' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/dbguard.log'),
+            'level' => 'debug',
+            'replace_placeholders' => true,
+        ],
     ],
 
 ];

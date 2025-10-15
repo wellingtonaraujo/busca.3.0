@@ -36,6 +36,18 @@ use Illuminate\Support\Facades\Route;
 
 Auth::routes();
 
+Route::get('/force-500', function () {
+    throw new \Exception('Erro 500 forçado para testes');
+});
+
+Route::get('/force404', function () {
+    abort(404);
+});
+
+Route::get('/force-404-model', function () {
+    User::findOrFail(99999999); // id que não existe
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/', [MainController::class, 'index'])->name('home');
     Route::get('/', [SearchController::class, 'index'])->middleware(['auth', 'verified'])->name('search');

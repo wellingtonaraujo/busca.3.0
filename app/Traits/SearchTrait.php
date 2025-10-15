@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 
 trait SearchTrait
 {
+    protected $tempoExecucao = 0;
+
     public function search(Request $request)
     {
         // retorna null se a $request->all() retiver vazia;
@@ -63,10 +65,8 @@ trait SearchTrait
 
         $end = microtime(true);
 
-        return [
-            'data' => $todasPessoas,
-            'tempo_execucao' => round($end - $start, 4) . 's'
-        ];
+        $this->tempoExecucao = round($end - $start, 4) . 's';
+        return $todasPessoas;
     }
 
 

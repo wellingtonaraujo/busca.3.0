@@ -23,21 +23,34 @@ class CustodiadoAntigo extends Model
         'idalojamento',
     ];
 
+    public function getIdAttribute($value)
+    {
+        return $this->idinterno;
+    }
+
+    public function getPessoaIdAttribute($value)
+    {
+        return $this->idpessoa;
+    }
+
     public function pessoa()
     {
         // interno.idpessoa → tbpessoa.id
         return $this->belongsTo(PessoaAntiga::class, 'idpessoa', 'id');
     }
 
-    public function regime(){
+    public function regime()
+    {
         return $this->hasOne(Regime::class, 'idprisao_regime', 'idprisao_regime');
     }
 
-    public function situacaoAtual(){
+    public function situacaoAtual()
+    {
         return $this->hasOne(CustodiadoSituacaoAtual::class, 'geral_status_idstatus', 'idsituacao_atual');
     }
 
-    public function vinculadoAntigo(){
+    public function vinculadoAntigo()
+    {
         return $this->hasOne(VinculadoAntigo::class, 'idinterno', 'idinterno');
     }
 }

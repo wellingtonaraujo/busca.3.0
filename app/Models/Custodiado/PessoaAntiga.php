@@ -2,6 +2,7 @@
 
 namespace App\Models\Custodiado;
 
+use App\Traits\HasFotoSsh;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class PessoaAntiga extends Model
 {
-    use HasFactory;
+    use HasFactory, HasFotoSsh;
 
     /** Conexão/tabela do banco legado */
     protected $connection = 'siapen';
@@ -28,6 +29,8 @@ class PessoaAntiga extends Model
         'profissao_id',
         'religiao_id',
         'altura',
+        // se a tabela tiver foto em base64:
+        // 'img', 'type',
     ];
 
     /** Casts úteis */
@@ -36,68 +39,64 @@ class PessoaAntiga extends Model
         'altura'     => 'float',
     ];
 
-    /* -----------------------------------------------------------------
-     |  Relações (SEM get()/first())
-     |------------------------------------------------------------------*/
+    /** (Opcional) expõe 'foto' no JSON com o accessor do Trait */
+    protected $appends = [
+        'foto', // habilite se quiser que saia automaticamente nas APIs
+        // 'vinculado_antigo', // idem
+    ];
 
-    /** PessoaAntiga -> CustodiadoAntigo (interno) */
+    /* ---------------- Relações ---------------- */
+
     public function custodiadoAntigo(): HasOne
     {
         // interno.idpessoa → tbpessoa.id
         return $this->hasOne(CustodiadoAntigo::class, 'idpessoa', 'id');
     }
 
-    /** PessoaAntiga sendo VISITANTE em vínculos */
     public function vinculadosComoVisitante(): HasMany
     {
-        return $this->hasMany(
-            VinculadoAntigo::class,
-            'idvisitante', // FK em vinculado_antigo
-            'id'           // PK local (tbpessoa.id)
-        );
+        return $this->hasMany(VinculadoAntigo::class, 'idvisitante', 'id');
     }
 
-    /** PessoaAntiga sendo INTERNO em vínculos */
     public function vinculadosComoInterno(): HasManyThrough
     {
         return $this->hasManyThrough(
-            VinculadoAntigo::class,  // tabela final
-            CustodiadoAntigo::class, // tabela intermediária
-            'idpessoa',              // FK em custodiado_antigo → tbpessoa.id
-            'idinterno',             // FK em vinculado_antigo → custodiado_antigo.idinterno
-            'id',                    // PK local (tbpessoa.id)
-            'idinterno'              // PK/coluna alvo em custodiado_antigo usada no vínculo
+            VinculadoAntigo::class,   // tabela final
+            CustodiadoAntigo::class,  // intermediária
+            'idpessoa',               // FK na intermediária → tbpessoa.id
+            'idinterno',              // FK na final → custodiado_antigo.idinterno
+            'id',                     // PK local
+            'idinterno'               // chave usada no vínculo
         );
     }
 
-    /** Documentos da pessoa no banco antigo */
+    public function visitantes(): HasMany
+    {
+        return $this->hasMany(VinculadoAntigo::class, 'idvisitante', 'id');
+    }
+
     public function documentosAntigos(): HasMany
     {
         return $this->hasMany(PessoaDocumentoAntigo::class, 'idpessoa', 'id');
     }
 
-    /** Contatos da pessoa no banco antigo */
     public function contatosAntigos(): HasMany
     {
         return $this->hasMany(PessoaContatoAntigo::class, 'idpessoa', 'id');
     }
 
-    /** Relação auxiliar usada no whereHas do search */
     public function internoVisitante(): HasOne
     {
         return $this->hasOne(InternoVisitante::class, 'idvisitante', 'id');
     }
 
-    /* -----------------------------------------------------------------
-     |  Accessors / Atributos computados
-     |------------------------------------------------------------------*/
+    public function getFotoAttribute(): ?string
+    {
+        return $this->fotoSsh();
+    }
 
-    /**
-     * Accessor que mescla os vínculos em que a pessoa é visitante + interno.
-     * Não é uma relação Eloquent; serve para leitura unificada sem quebrar eager loading.
-     *
-     * Uso: $model->vinculado_antigo  (ou inclua em $appends para sair no JSON)
-     */
+    /* -------- Accessors computados -------- */
+
     public function getVinculadoAntigoAttribute()
     {
         $visitantes = $this->relationLoaded('vinculadosComoVisitante')
@@ -108,10 +107,12 @@ class PessoaAntiga extends Model
             ? $this->getRelation('vinculadosComoInterno')
             : $this->vinculadosComoInterno()->get();
 
-        // concat preserva chaves; values() reindexa
         return $visitantes->concat($internos)->values();
     }
 
-    // Se quiser que o atributo apareça automaticamente no JSON:
-    // protected $appends = ['vinculado_antigo'];
+    /** (Opcional) se quiser declarar explicitamente para o Trait */
+    // public function getLegacyPessoaIdForFoto(): ?int
+    // {
+    //     return $this->id; // aqui você pode customizar se necessário
+    // }
 }

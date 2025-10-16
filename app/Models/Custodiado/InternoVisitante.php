@@ -18,6 +18,10 @@ class InternoVisitante extends Model
         'idstatus',
     ];
 
+    public function getIdAttributes($value){
+        return $this->idinterno_visitante;
+    }
+
     public function custodiadoAntigo(){
         return $this->hasOne(CustodiadoAntigo::class, 'idinterno', 'idinterno');
     }

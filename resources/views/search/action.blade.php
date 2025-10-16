@@ -6,7 +6,7 @@
 @if (!is_null($cid))
     <form method="POST" action="{{ route('consultaPrisional') }}">
         @csrf
-        <input type="hidden" name="pessoa" value="{{ $model->id }}">
+        <input type="hidden" name="pessoa_id" value="{{ $model->id }}">
         <input type="hidden" name="custodiado_id" value="{{ $cid }}">
         <input type="hidden" name="origem" value="{{ $origem }}">
         <button type="submit" class="text-blue-500 hover:text-blue-700" title="Consulta Prisional">

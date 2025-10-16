@@ -39,7 +39,7 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
         ],
@@ -56,6 +56,29 @@ return [
             'throw' => false,
         ],
 
+        'sftp' => [
+            'driver'     => 'sftp',
+            'host'       => env('SFTP_HOST'),
+
+            'username'   => env('SFTP_USERNAME'),
+
+            // NORMALIZA STRINGS VAZIAS PARA null (o pacote espera null, não "")
+            'password'   => env('SFTP_PASSWORD')   ?: null,
+            'privateKey' => env('SFTP_PRIVATE_KEY') ?: null,
+            'passphrase' => env('SFTP_PASSPHRASE')  ?: null,
+
+            // ESTES PRECISAM SER INT/BOOL
+            'port'       => (int) env('SFTP_PORT', 22),
+            'timeout'    => (int) env('SFTP_TIMEOUT', 10),
+            'maxTries'   => (int) env('SFTP_MAX_TRIES', 4),
+            'useAgent'   => (bool) env('SFTP_USE_AGENT', false),
+
+            // STRINGS
+            'root'       => env('SFTP_ROOT', '/home/servidor'),
+
+            // OPCIONAIS (SE QUISER VALIDAR O HOST)
+            // 'hostFingerprint' => env('SFTP_HOST_FINGERPRINT') ?: null,
+        ],
     ],
 
     /*

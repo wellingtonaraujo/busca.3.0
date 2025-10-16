@@ -42,3 +42,13 @@ para:
 APP_URL=http://sua-aplicacai.desenv
 ### Também faça as devidas alterações nas chaves de conexão com o banco de dados
 
+### instalar plugin de imagens
+composer require intervention/image:^3
+php artisan vendor:publish --provider="Intervention\Image\Laravel\ServiceProvider" --tag=config
+
+>>> use Intervention\Image\Laravel\Facades\Image;
+>>> $p = public_path('assets/images/icons/avatar5.png');
+>>> file_exists($p);              // deve retornar true
+>>> $uri = Image::read($p)->toDataUri();
+>>> substr($uri, 0, 40);          // deve começar com "data:image/png;base64,"
+

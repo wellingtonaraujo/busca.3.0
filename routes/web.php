@@ -13,9 +13,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\AuthorizedAccessRoute;
+use App\Models\Custodiado\PessoaAntiga;
 use App\Models\Profile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +49,66 @@ Route::get('/force404', function () {
 
 Route::get('/force-404-model', function () {
     User::findOrFail(99999999); // id que não existe
+});
+
+// routes/web.php
+Route::get('/sftp-test', function () {
+    try {
+        $files = Storage::disk('sftp')->files('gsip/images/custodiados');
+        $sample = $files[0] ?? null;
+        if (!$sample) return 'SEM ARQUIVOS';
+        $content = Storage::disk('sftp')->get($sample);
+        return 'OK: ' . substr($content, 0, 50);
+    } catch (\Throwable $e) {
+        return 'ERRO SFTP: ' . $e->getMessage();
+    }
+});
+
+Route::get('/test-image', function () {
+    $p = public_path('assets/images/icons/avatar5.png');
+    if (!is_file($p)) return 'ARQUIVO NÃO ENCONTRADO: ' . $p;
+
+    $mime = mime_content_type($p);                 // ex.: image/png
+    $b64  = base64_encode(file_get_contents($p));  // bytes → base64
+    return 'data:' . $mime . ';base64,' . $b64;          // DATA-URI
+});
+
+// routes/web.php
+use Illuminate\Support\Facades\DB;
+
+Route::get('/test-foto/{idinterno}', function (int $idinterno) {
+    // 1) mapear idinterno -> idpessoa no banco antigo
+    $row = DB::connection('siapen')
+        ->table('interno')
+        ->select('idpessoa')
+        ->where('idinterno', $idinterno)
+        ->first();
+
+    if (!$row) {
+        return "interno {$idinterno} não encontrado na conexão 'siapen'.";
+    }
+
+    // 2) carregar o modelo que tem o método fotoSsh()
+    $alvo = PessoaAntiga::where('id', $row->idpessoa)->first();
+    if (!$alvo) {
+        // se não existir na base nova, instancie só com o atributo necessário
+        $alvo = new PessoaAntiga();
+        $alvo->idpessoa = $row->idpessoa;
+    }
+
+    // 3) chamar o método
+    $uri = $alvo->fotoSsh();
+
+    // 4) render simples pra visualizar
+    return <<<HTML
+        <div style="font:14px/1.4 sans-serif">
+            <p><strong>idinterno:</strong> {$idinterno}</p>
+            <p><strong>idpessoa:</strong> {$row->idpessoa}</p>
+            <p><strong>preview:</strong></p>
+            <img src="{$uri}" alt="foto" style="max-width:280px;border:1px solid #ccc;padding:4px;border-radius:8px">
+            <p><strong>prefixo data-uri:</strong> <code>{substr($uri, 0, 40)}...</code></p>
+        </div>
+    HTML;
 });
 
 Route::middleware(['auth'])->group(function () {

@@ -3,10 +3,12 @@
 namespace App\Traits;
 
 use App\Models\Custodiado\Custodiado;
+use App\Models\Custodiado\CustodiadoAntigo;
 use App\Models\Custodiado\Pessoa;
 use App\Models\Custodiado\PessoaAntiga;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Relations\Relation;
 
 trait SearchTrait
 {
@@ -102,8 +104,6 @@ trait SearchTrait
 
         return $str;
     }
-
-
 
     private function buscarPessoa(Request $request)
     {
@@ -219,5 +219,116 @@ trait SearchTrait
             });
 
         return $pessoasAntigas;
+    }
+
+    /**
+     * Cria aliases "sem Antigo" no $custodiado e dentro de $custodiado->pessoa
+     * Ex.: vinculadoAntigo -> vinculado; documentosAntigos -> documentos; etc.
+     */
+    protected function aliasLegacyOnCustodiado(CustodiadoAntigo $custodiado): void
+    {
+        // ---------- ALIASES DIRETOS DO CUSTODIADO ----------
+        // Mapeamentos explícitos (seguros)
+        $mapSelf = [
+            'vinculadoAntigo' => 'vinculado',
+            // outras relações locais com "Antigo" você pode adicionar aqui…
+        ];
+
+        foreach ($mapSelf as $from => $to) {
+            if (method_exists($custodiado, $from)) {
+                $rel = $custodiado->{$from}(); // Relation
+                if ($rel instanceof Relation) {
+                    $custodiado->setRelation($to, $rel->getResults());
+                } else {
+                    // caso não seja Relation, cai como atributo “normal”
+                    $custodiado->setAttribute($to, $custodiado->{$from});
+                }
+            }
+        }
+
+        // ---------- ALIASES DENTRO DE PESSOA ----------
+        if ($custodiado->relationLoaded('pessoa') || $custodiado->pessoa) {
+            $pessoa = $custodiado->pessoa;
+
+            // Mapeamentos explícitos (seguros) em PessoaAntiga
+            $mapPessoa = [
+                'custodiadoAntigo'       => 'custodiado',
+                'documentosAntigos'      => 'documentos',
+                'contatosAntigos'        => 'contatos',
+                // mantive os nomes autoexplicativos para diferenciar as duas pontas
+                'vinculadosComoVisitante' => 'vinculados_visitante',
+                'vinculadosComoInterno'  => 'vinculados_interno',
+                'internoVisitante'       => 'interno_visitante',
+            ];
+
+            foreach ($mapPessoa as $from => $to) {
+                if (method_exists($pessoa, $from)) {
+                    $rel = $pessoa->{$from}(); // Relation
+                    if ($rel instanceof Relation) {
+                        $pessoa->setRelation($to, $rel->getResults());
+                    } else {
+                        $pessoa->setAttribute($to, $pessoa->{$from});
+                    }
+                }
+            }
+
+            // O accessor getVinculadoAntigoAttribute() já faz o merge dos dois
+            // conjuntos de vínculos; alias final para 'vinculados'
+            $pessoa->setAttribute('vinculados', $pessoa->vinculado_antigo);
+
+            // Atalhos úteis direto no $custodiado (se quiser acessar sem “->pessoa”)
+            $custodiado->setRelation('pessoa_documentos', $pessoa->getRelation('documentos') ?? collect());
+            $custodiado->setRelation('pessoa_contatos',   $pessoa->getRelation('contatos')   ?? collect());
+            $custodiado->setRelation('vinculados',        $pessoa->getAttribute('vinculados') ?? collect());
+        }
+
+        // ---------- PASSO OPCIONAL: ALIAS AUTOMÁTICO POR REFLEXÃO ----------
+        // Qualquer método *de relação* que termine com "Antigo" vira um alias
+        // sem o sufixo (ex.: "fooAntigo" -> "foo").
+        $this->aliasByReflection($custodiado, CustodiadoAntigo::class);
+        if ($custodiado->pessoa) {
+            $this->aliasByReflection($custodiado->pessoa, \App\Models\Custodiado\PessoaAntiga::class);
+        }
+    }
+
+    /**
+     * Cria aliases automaticamente para métodos de relação que terminem com "Antigo".
+     * Ex.: metodoAntigo() => alias "metodo"
+     */
+    protected function aliasByReflection(object $model, string $classFqcn): void
+    {
+        try {
+            $rc = new \ReflectionClass($classFqcn);
+            foreach ($rc->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
+                $name = $m->getName();
+
+                // ignora herdados do Model/traits e só pega os deste FQCN
+                if ($m->getDeclaringClass()->getName() !== $classFqcn) {
+                    continue;
+                }
+
+                if (!str_ends_with($name, 'Antigo')) {
+                    continue;
+                }
+
+                // tenta invocar e ver se retorna Relation
+                $result = null;
+                try {
+                    $result = $model->{$name}();
+                } catch (\Throwable $e) {
+                    continue; // se não invocar como relação, pula
+                }
+
+                if ($result instanceof Relation) {
+                    $alias = substr($name, 0, -strlen('Antigo'));
+                    // se já existir um alias explícito, respeitamos (não sobrescreve)
+                    if (!$model->relationLoaded($alias)) {
+                        $model->setRelation($alias, $result->getResults());
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            // silencioso por segurança; se preferir, logue aqui
+        }
     }
 }

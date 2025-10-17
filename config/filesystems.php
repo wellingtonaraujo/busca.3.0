@@ -57,28 +57,26 @@ return [
         ],
 
         'sftp' => [
-            'driver'     => 'sftp',
-            'host'       => env('SFTP_HOST'),
+            'driver'   => 'sftp',
+            'host'     => env('SFTP_HOST'),
+            'port'     => (int) env('SFTP_PORT', 22),
+            'username' => env('SFTP_USERNAME'),
 
-            'username'   => env('SFTP_USERNAME'),
+            // USE APENAS UM MÉTODO DE AUTENTICAÇÃO:
+            'password'   => env('SFTP_PASSWORD'), // ← estamos usando este AGORA
 
-            // NORMALIZA STRINGS VAZIAS PARA null (o pacote espera null, não "")
-            'password'   => env('SFTP_PASSWORD')   ?: null,
-            'privateKey' => env('SFTP_PRIVATE_KEY') ?: null,
-            'passphrase' => env('SFTP_PASSPHRASE')  ?: null,
+            // Deixe a chave privada NULL por enquanto:
+            'privateKey' => null,
+            'passphrase' => null,
 
-            // ESTES PRECISAM SER INT/BOOL
-            'port'       => (int) env('SFTP_PORT', 22),
-            'timeout'    => (int) env('SFTP_TIMEOUT', 10),
-            'maxTries'   => (int) env('SFTP_MAX_TRIES', 4),
-            'useAgent'   => (bool) env('SFTP_USE_AGENT', false),
+            'root'       => env('SFTP_ROOT', '/home/servidor/gsip/images'),
+            'timeout'    => (int) env('SFTP_TIMEOUT', 30),
 
-            // STRINGS
-            'root'       => env('SFTP_ROOT', '/home/servidor'),
-
-            // OPCIONAIS (SE QUISER VALIDAR O HOST)
-            // 'hostFingerprint' => env('SFTP_HOST_FINGERPRINT') ?: null,
+            // opcionais
+            // 'maxTries'   => (int) env('SFTP_MAX_TRIES', 4),
+            // 'useAgent'   => (bool) env('SFTP_USE_AGENT', false),
         ],
+
     ],
 
     /*

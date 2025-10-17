@@ -4,7 +4,7 @@
     'buttons' => [], // Array de botões opcionais
 ])
 
-<header class="bg-yellow-500 text-black shadow-md rounded-xl w-full text-sm py-4 px-6">
+<header class="bg-gray-900 text-gray-200 p-6 rounded-xl shadow-md  rounded-xl w-full text-sm py-4 px-6 border border-cyan-500 hover:shadow-cyan-500/50">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <!-- Título e breadcrumbs -->
         <div class="flex flex-col md:flex-row md:items-center gap-2">
@@ -16,14 +16,14 @@
                         @foreach ($breadcrumbs as $breadcrumb)
                             <li class="flex items-center">
                                 @if (isset($breadcrumb['link']))
-                                    <a href="{{ $breadcrumb['link'] }}" class="text-gray-700 hover:text-gray-900">
+                                    <a href="{{ $breadcrumb['link'] }}" class="text-cyan-200 hover:text-cyan-400">
                                         @if (isset($breadcrumb['icon']))
                                             <i class="{{ $breadcrumb['icon'] }}"></i>
                                         @endif
                                         {{ $breadcrumb['label'] }}
                                     </a>
                                 @else
-                                    <span class="text-gray-500">
+                                    <span class="text-cyan-400">
                                         @if (isset($breadcrumb['icon']))
                                             <i class="{{ $breadcrumb['icon'] }}"></i>
                                         @endif

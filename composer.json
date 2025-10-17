@@ -62,7 +62,10 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "intervention/image",
+                "intervention/image-laravel"
+            ]
         }
     },
     "config": {

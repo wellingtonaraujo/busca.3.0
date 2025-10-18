@@ -3,10 +3,12 @@
 namespace App\Models\Custodiado;
 
 use App\Classes\Datas;
+use App\Models\Custodiado\PessoaFoto;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Image;
+use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Pessoa extends Model
 {
@@ -62,6 +64,22 @@ class Pessoa extends Model
         return $this->hasMany(PessoaDocumento::class, 'pessoa_id', 'id');
     }
 
+    public function documentosSlim()
+    {
+        return $this->hasMany(PessoaDocumento::class, 'pessoa_id')
+            ->select([
+                'id',
+                'pessoa_id',
+                'documento_tipo_id',
+                'expedicao_estado_id',
+                'expedicao_pais_id',
+                'documento_numero',
+                'data_expedicao',
+                'orgao_expedicao',
+                'descricao',
+            ]);
+    }
+
     public function custodiado()
     {
         return $this->hasOne(Custodiado::class, 'pessoa_id', 'id');
@@ -106,27 +124,37 @@ class Pessoa extends Model
         return null;
     }
 
-    // public function foto()
-    // {
-    //     $fotos = PessoaFoto::where('pessoa_id', $this->id)->get();
+    public function fotos(): HasMany
+    {
+        return $this->hasMany(\App\Models\Custodiado\PessoaFoto::class, 'pessoa_id');
+    }
 
-    //     if ($fotos->count() > 0) {
-    //         $fotoPerfil = PessoaFoto::where('pessoa_id', $this->id)
-    //             ->where('foto_tipo_id', 1)
-    //             ->orWhere(function ($query) {
-    //                 $query->where('pessoa_id', $this->id)
-    //                     ->where('foto_posicao_id', 1);
-    //             })
-    //             ->orderBy('id', 'desc')
-    //             ->first();
-    //         if (!is_null($fotoPerfil)) {
-    //             $foto = "data:" . $fotoPerfil->img_type . ";base64," . $fotoPerfil->img;
-    //             return $foto;
-    //         } else {
-    //             return null;
-    //         }
-    //     }
+    /** Data URI derivado da foto principal */
+    public function getFotoDataUriAttribute(): string
+    {
+        dd($this, $this->nome);
+        // Tenta usar a coleção já carregada (evita N+1)
+        $fotos = $this->relationLoaded('fotos')
+            ? $this->fotoss
+            : \App\Models\Custodiado\PessoaFoto::where('pessoa_id', $this->id)->get();
 
-    //     return null;
-    // }
+        $fotoPerfil = $fotos
+            ->firstWhere('foto_tipo_id', 1)
+            ?? $fotos->firstWhere('foto_posicao_id', 1)
+            ?? $fotos->sortByDesc('id')->first();
+
+        if ($fotoPerfil) {
+            return "data:{$fotoPerfil->img_type};base64,{$fotoPerfil->img}";
+        }
+
+        // fallback
+        return \Intervention\Image\Laravel\Facades\Image::read(
+            public_path('assets/images/icons/no_image.png')
+        )->toPng()->toDataUri();
+    }
+
+    public function fotoPrincipal()
+    {
+        return $this->belongsTo(PessoaFoto::class, 'principal_pessoa_foto_id');
+    }
 }

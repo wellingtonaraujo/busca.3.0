@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Custodiado\Custodiado;
 use App\Models\Custodiado\CustodiadoAntigo;
 use App\Models\Custodiado\PessoaAntiga;
 use App\Models\Custodiado\Regime;
@@ -22,8 +23,8 @@ class SearchController extends Controller
         $this->initPageHeader();
         $prev = url()->previous();
         $fallback = route('search'); // ajuste para a rota que você quiser como padrão
-
-        $this->breadcrumbs[] = ['label' => 'Pesquisar pessoas', 'icon' => 'ti ti-search', 'link' => $prev && $prev !== url()->current() ? $prev : $fallback,];
+        if (isset(request()->routeSearch))
+            $this->breadcrumbs[] = ['label' => 'Pesquisar pessoas', 'icon' => 'ti ti-search', 'link' => url(request()->routeSearch)];
 
         $this->titulo = 'Consulta Prisional';
 
@@ -39,12 +40,17 @@ class SearchController extends Controller
         $pessoas = $this->search(request());
         $tempo_execucao = $this->tempoExecucao;
         $parametros = request()->all();
+        $routeSearch = route('search', $parametros);
 
-        return view('search.index', compact('pessoas', 'parametros', 'tempo_execucao'));
+        return view('search.index', compact('pessoas', 'parametros', 'tempo_execucao', 'routeSearch'));
     }
 
     public function consultaPrisional(Request $request)
     {
+
+        // rota de retorno para a search.index
+        $routeSearch = $request->routeSearch;
+
         // retorna para index caso a request esteja vazia
         if ($this->requestEmpty($request)) {
             return redirect()->route('search.index');
@@ -80,11 +86,32 @@ class SearchController extends Controller
             $breadcrumbs = $this->breadcrumbs;
             $otherButtons = $this->buttons;
             $foto = $custodiado->pessoa->foto;
-            return view('search.consulta-prisional', compact('custodiado', 'titulo', 'breadcrumbs', 'otherButtons', 'foto'));
+            return view('search.consulta-prisional', compact('custodiado', 'titulo', 'breadcrumbs', 'otherButtons', 'foto', 'routeSearch'));
         } else {
             // TODO: implementar ramo da base nova
-            Alert::info('Info', 'Consulta na base nova ainda não implementada.');
-            return back()->withInput();
+
+            $custodiado = Custodiado::query()
+                ->with([
+                    'pessoa:id,nome,alcunha',
+                    'pessoa.documentosSlim', // USA A RELAÇÃO LEVE
+                    'pessoa.contatos:id,pessoa_id,contato,vinculado_tipo_id',
+                    'regime:id,descricao',
+                    'situacaoAtual:id,descricao',
+                    'fotoRel:id,pessoa_id,img,img_type,foto_tipo_id,foto_posicao_id', // <- relação com outro nome
+                ])
+                ->where('id', $request->custodiado_id)
+                ->first();
+
+            if (!$custodiado) {
+                Alert::info('Atenção', "Registro não encontrado na base de dados");
+                return redirect()->back()->withInput();
+            }
+
+            $titulo = "Consulta Prisional";
+            $breadcrumbs = $this->breadcrumbs;
+            $otherButtons = $this->buttons;
+            $foto = $custodiado->foto;
+            return view('search.consulta-prisional', compact('custodiado', 'titulo', 'breadcrumbs', 'otherButtons', 'foto', 'routeSearch'));
         }
     }
 }

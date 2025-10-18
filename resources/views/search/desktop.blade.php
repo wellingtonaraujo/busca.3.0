@@ -72,7 +72,7 @@
                 {{-- Ações --}}
                 <td class="px-4 py-2">
                     <div class="flex items-center gap-2">
-                        @include('search.action', ['model'=>$model, 'custodiado_id'=>optional($model->custodiado)->id ?? null, 'origem'=>$model->origem])
+                        @include('search.action', ['model'=>$model, 'custodiado_id'=>optional($model->custodiado)->id ?? null, 'origem'=>$model->origem, 'routeSearch'=>$routeSearch])
                     </div>
                 </td>
             </tr>

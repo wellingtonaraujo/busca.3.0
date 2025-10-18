@@ -49,7 +49,8 @@ class PessoaAntiga extends Model
     /** (Opcional) expõe 'foto' no JSON com o accessor do Trait */
     protected $appends = ['foto']; // já estava aí
 
-    public function getNascimentoAttributes($value){
+    public function getNascimentoAttributes($value)
+    {
         return $value ? Carbon::parse($value)->format('d/m/Y') : null;
     }
 
@@ -97,77 +98,6 @@ class PessoaAntiga extends Model
     {
         return $this->hasOne(InternoVisitante::class, 'idvisitante', 'id');
     }
-
-    // public function fotoSsh(): ?string
-    // {
-    //     // Fallback padrão (ajuste o caminho se quiser)
-    //     $fallbackPath = public_path('assets/images/icons/no_image.png');
-
-    //     try {
-    //         // 1) Se a própria pessoa tiver img base64 na tabela (campos opcionais)
-    //         if (!empty($this->img) && !empty($this->type)) {
-    //             // retorna data-uri direto do BD
-    //             return "data:{$this->type};base64,{$this->img}";
-    //         }
-
-    //         // 2) Tenta foto de visitante (legado)
-    //         $foto = DB::connection('siapen')
-    //             ->table('visitante_foto')
-    //             ->where('idvisitante', $this->id)   // 'id' da tbpessoa
-    //             ->where('idposicao', 1)
-    //             ->first();
-
-    //         if ($foto && !empty($foto->arquivo)) {
-    //             // caminho remoto relativo à raiz SFTP configurada (SFTP_ROOT)
-    //             $remoteFile = "vinculos/{$foto->arquivo}";
-
-    //             if (Storage::disk('sftp')->fileExists($remoteFile)) {
-    //                 $content = Storage::disk('sftp')->get($remoteFile);
-    //                 return Image::read($content)->toDataUri();
-    //             }
-    //         }
-
-    //         // 3) Tenta foto como interno (custodiado)
-    //         $interno = DB::connection('siapen')
-    //             ->table('interno')
-    //             ->where('idpessoa', $this->id)
-    //             ->orderBy('idinterno')
-    //             ->first();
-
-    //         if ($interno) {
-    //             $fotoInterno = DB::connection('siapen')
-    //                 ->table('interno_foto')
-    //                 ->where('idinterno', $interno->idinterno)
-    //                 ->where('idposicao', 1)
-    //                 ->orderByDesc('arquivo')
-    //                 ->first();
-
-    //             if ($fotoInterno && !empty($fotoInterno->arquivo)) {
-    //                 $remoteFile = "/home/servidor/gsip/images/custodiados/{$fotoInterno->arquivo}";
-
-    //                 if (Storage::disk('sftp')->fileExists($remoteFile)) {
-    //                     $content = Storage::disk('sftp')->get($remoteFile);
-    //                     dd($content);
-    //                     return Image::read($content)->toDataUri();
-    //                 }
-
-    //                 dd("deu merda");
-    //             }
-    //         }
-
-    //         // 4) Sem nada no SFTP/BD → fallback local
-    //         return Image::read($fallbackPath)->toDataUri();
-    //     } catch (\Throwable $e) {
-    //         \Log::warning('fotoSsh fallback: ' . $e->getMessage(), ['pessoa_id' => $this->id]);
-    //         // Em erro, retorna fallback local
-    //         try {
-    //             return Image::read($fallbackPath)->toDataUri();
-    //         } catch (\Throwable $e2) {
-    //             \Log::error('fotoSsh fallback falhou: ' . $e2->getMessage());
-    //             return null;
-    //         }
-    //     }
-    // }
 
     public function getFotoAttribute(): ?string
     {
@@ -226,7 +156,9 @@ class PessoaAntiga extends Model
             }
 
             // 4) fallback local
-            return Image::read($fallbackPath)->toDataUri();
+            return Image::read(public_path('assets/images/icons/no_image.png'))
+                ->toPng()
+                ->toDataUri();
         } catch (\Throwable $e) {
             \Log::warning('foto fallback: ' . $e->getMessage(), ['pessoa_id' => $this->id]);
             try {

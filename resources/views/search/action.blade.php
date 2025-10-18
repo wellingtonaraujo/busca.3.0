@@ -9,6 +9,7 @@
         <input type="hidden" name="pessoa_id" value="{{ $model->id }}">
         <input type="hidden" name="custodiado_id" value="{{ $cid }}">
         <input type="hidden" name="origem" value="{{ $origem }}">
+        <input type="hidden" name="routeSearch" value="{{ $routeSearch }}">
         <button type="submit" class="text-blue-500 hover:text-blue-700" title="Consulta Prisional">
             <i class="ti ti-search text-cyan-100 text-2xl"></i>
         </button>

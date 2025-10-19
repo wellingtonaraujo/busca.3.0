@@ -92,7 +92,16 @@ class SearchController extends Controller
 
             $custodiado = Custodiado::query()
                 ->with([
-                    'pessoa:id,nome,alcunha',
+                    'pessoa' => function ($q) {
+                        $q->select('id', 'nome', 'alcunha', 'nascimento')
+                            ->selectRaw('TIMESTAMPDIFF(YEAR,
+                    COALESCE(
+                        STR_TO_DATE(nascimento, "%Y-%m-%d"),
+                        STR_TO_DATE(nascimento, "%d/%m/%Y")
+                    ),
+                    CURDATE()
+                ) AS idade');
+                    },
                     'pessoa.documentosSlim', // USA A RELAÇÃO LEVE
                     'pessoa.contatos:id,pessoa_id,contato,vinculado_tipo_id',
                     'regime:id,descricao',

@@ -47,11 +47,116 @@ class PessoaAntiga extends Model
     ];
 
     /** (Opcional) expõe 'foto' no JSON com o accessor do Trait */
-    protected $appends = ['foto']; // já estava aí
+    protected $appends = ['foto', 'idade']; // já estava aí
 
-    public function getNascimentoAttributes($value)
+    /**
+     * Nascimento formatado em d/m/Y quando acessar $pessoa->nascimento.
+     */
+    public function getNascimentoAttribute($value): ?string
     {
-        return $value ? Carbon::parse($value)->format('d/m/Y') : null;
+        if (blank($value)) {
+            return null;
+        }
+        try {
+            return Carbon::parse($value)->format('d/m/Y');
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Idade calculada a partir do valor bruto do campo 'nascimento' (sem o accessor).
+     * Disponível em $pessoa->idade
+     */
+    public function getIdadeAttribute(): ?int
+    {
+        // pega o valor original do banco, sem formatação
+        $raw = $this->getRawOriginal('nascimento') ?? $this->attributes['nascimento'] ?? null;
+        if (blank($raw)) {
+            return null;
+        }
+        try {
+            return Carbon::parse($raw)->age;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * CPF formatado (000.000.000-00) do banco legado, ao acessar $pessoa->cpf
+     */
+    public function getCpfAttribute(): ?string
+    {
+        // Busca o último registro de documento cujo tipo seja "CPF"
+        $cpfDocId = GeralDocumento::query()
+            ->where('documento', 'CPF')
+            ->value('iddocumento');
+
+        if (!$cpfDocId) {
+            return null;
+        }
+
+        $numero = PessoaDocumentoAntigo::query()
+            ->where('idpessoa', $this->id)
+            ->where('iddocumento', $cpfDocId)
+            ->latest('idpessoa_documento')
+            ->value('numero_documento');
+
+        if (blank($numero)) {
+            return null;
+        }
+
+        $digits = preg_replace('/\D/', '', (string) $numero);
+        if (strlen($digits) !== 11) {
+            // se não tiver 11 dígitos, retorna o que veio
+            return trim((string) $numero);
+        }
+
+        // 000.000.000-00
+        return substr($digits, 0, 3) . '.'
+            . substr($digits, 3, 3) . '.'
+            . substr($digits, 6, 3) . '-'
+            . substr($digits, 9, 2);
+    }
+
+    /**
+     * RG no formato NUMERO-UF (ex.: 1523456-AP) do banco legado, ao acessar $pessoa->rg
+     */
+    public function getRgAttribute(): ?string
+    {
+        // Busca o último registro de documento cujo tipo seja "RG"
+        $rgDocId = GeralDocumento::query()
+            ->where('documento', 'RG')
+            ->value('iddocumento');
+
+        if (!$rgDocId) {
+            return null;
+        }
+
+        $doc = PessoaDocumentoAntigo::query()
+            ->where('idpessoa', $this->id)
+            ->where('iddocumento', $rgDocId)
+            ->latest('idpessoa_documento')
+            ->first(['numero_documento', 'uf_documento']);
+
+        if (!$doc || blank($doc->numero_documento)) {
+            return null;
+        }
+
+        // Número: mantém dígitos/letras (há RGs com X, etc.)
+        $numero = preg_replace('/[^0-9A-Za-z]/', '', (string) $doc->numero_documento);
+        if ($numero === '') {
+            return null;
+        }
+
+        // UF pela fk para GeralEstado (idestado)
+        $uf = null;
+        if (!empty($doc->uf_documento)) {
+            $estado = GeralEstado::where('idestado', $doc->uf_documento)->first();
+            $uf = optional($estado)->sigla;
+        }
+
+        return $uf ? "{$numero}-{$uf}" : $numero;
     }
 
     /* ---------------- Relações ---------------- */

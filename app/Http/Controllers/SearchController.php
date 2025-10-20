@@ -13,6 +13,7 @@ use App\Traits\SearchTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\Cache;
 
 class SearchController extends Controller
 {
@@ -51,7 +52,7 @@ class SearchController extends Controller
 
         // rota de retorno para a search.index
         $routeSearch = $request->routeSearch;
-
+        $start = microtime(true);
         // retorna para index caso a request esteja vazia
         if ($this->requestEmpty($request)) {
             return redirect()->route('search.index');
@@ -90,7 +91,7 @@ class SearchController extends Controller
 
             $p = $custodiado->pessoa;
             $tem = PessoaEnderecoAntigo::where('idpessoa', $p->id)->orderBy('id', 'desc')->first();
-            dd($p->id, $tem);
+
             if ($endereco = $custodiado->pessoa->endereco) {
                 dd($endereco);
                 dd($endereco->endereco, $endereco->numero, $endereco->complemento, $endereco->bairro->nome, $endereco->cidade->nome, $endereco->estado->nome, $endereco->pais->nome);
@@ -100,40 +101,69 @@ class SearchController extends Controller
             $breadcrumbs = $this->breadcrumbs;
             $otherButtons = $this->buttons;
             $foto = $custodiado->pessoa->foto;
-            return view('search.consulta-prisional', compact('custodiado', 'titulo', 'breadcrumbs', 'otherButtons', 'foto', 'routeSearch'));
+            $end = microtime(true);
+            $this->tempoExecucao = round($end - $start, 4) . 's';
+            $tempo_execucao = $this->tempoExecucao;
+            return view('search.consulta-prisional', compact('custodiado', 'titulo', 'breadcrumbs', 'otherButtons', 'foto', 'routeSearch', 'tempo_execucao'));
         } else {
-            // TODO: implementar ramo da base nova
+            // TODO: Consulta em custodiado na base de dados nova
+            $id = (int) $request->custodiado_id;
 
-            $custodiado = Custodiado::query()
-                ->with([
-                    'pessoa' => function ($q) {
-                        $q->select('id', 'nome', 'alcunha', 'nascimento')
-                            ->with([
-                                'documentosSlim:id,pessoa_id,documento_tipo_id,expedicao_estado_id,expedicao_pais_id,documento_numero,data_expedicao,orgao_expedicao,descricao',
-                                'contatos:id,pessoa_id,contato,vinculado_tipo_id',
-                                'endereco:id,endereco,numero,bairro_id,cep,cidade_id,uf_id,complemento', // ajuste aos nomes reais
-                            ]);
-                    },
-                    'regime:id,descricao',
-                    'situacaoAtual:id,descricao',
-                    'fotoRel:id,pessoa_id,img,img_type,foto_tipo_id,foto_posicao_id',
-                ])
-                ->find($request->custodiado_id);
+            $custodiado = Cache::remember("consulta_prisional:v2:custodiado:$id", 60, function () use ($id) {
+                return Custodiado::query()
+                    ->from('custodiados as c')
+                    ->select(['c.id', 'c.pessoa_id', 'c.regime_id', 'c.custodiado_situacao_atual_id'])
+                    ->with([
+                        'regime:id,descricao',
+                        'situacaoAtual:id,descricao',
+
+                        'pessoa:id,nome,alcunha,nascimento',
+                        'pessoa.endereco:id,endereco,numero,complemento,bairro_id,cidade_id,uf_id,cep',
+                        'pessoa.endereco.bairro:id,nome',
+                        'pessoa.endereco.cidade:id,nome',
+                        'pessoa.endereco.estado:id,sigla',
+
+                        'pessoa.contatos:id,pessoa_id,contato_tipo_id,vinculado_tipo_id,contato,observacao,nome',
+                        'pessoa.contatos.contatoTipo:id,descricao',
+                        'pessoa.contatos.vinculadoTipo:id,descricao',
+
+                        'pessoa.documentos:id,documento_tipo_id,expedicao_estado_id,expedicao_pais_id,documento_numero,data_expedicao,orgao_expedicao,descricao',
+                        'pessoa.documentos.documentoTipo:id,abreviatura',
+                        'pessoa.documentos.estado:id,sigla',
+                        'pessoa.documentos.pais:id,sigla',
+
+                        'pessoa.fotos:id,img,img_type,foto_tipo_id,foto_posicao_id',
+                    ])
+                    ->where('c.id', $id)
+                    ->first();
+            });
 
             if (!$custodiado) {
                 Alert::info('Atenção', "Registro não encontrado na base de dados");
                 return redirect()->back()->withInput();
             }
 
-            if ($endereco = $custodiado->pessoa->endereco) {
-                dd($endereco->endereco, $endereco->numero, $endereco->complemento, $endereco->bairro->nome, $endereco->cidade->nome, $endereco->estado->nome, $endereco->pais->nome);
-            }
-
-            $titulo = "Consulta Prisional";
-            $breadcrumbs = $this->breadcrumbs;
+            $titulo       = "Consulta Prisional";
+            $breadcrumbs  = $this->breadcrumbs;
             $otherButtons = $this->buttons;
-            $foto = $custodiado->foto;
-            return view('search.consulta-prisional', compact('custodiado', 'titulo', 'breadcrumbs', 'otherButtons', 'foto', 'routeSearch'));
+            $routeSearch  = route('search');
+
+            // Foto: usa a base64 gerada pelos accessors da Pessoa; se não houver, a Blade cai no fallback
+            $foto = optional($custodiado->pessoa)->foto_base64;
+
+            $end = microtime(true);
+            $this->tempoExecucao = round($end - $start, 4) . 's';
+            $tempo_execucao = $this->tempoExecucao;
+
+            return view('search.consulta-prisional', compact(
+                'custodiado',
+                'titulo',
+                'breadcrumbs',
+                'otherButtons',
+                'foto',
+                'routeSearch',
+                'tempo_execucao'
+            ));
         }
     }
 }

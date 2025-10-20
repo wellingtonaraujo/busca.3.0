@@ -12,7 +12,7 @@ class Bairro extends Model
     /*
     	@description nome da tabela do banco
      */
-    protected $connection = 'mysql';
+    protected $connection = 'siapenweb';
     protected $table = 'bairros';
     /*
     	campos da tabela

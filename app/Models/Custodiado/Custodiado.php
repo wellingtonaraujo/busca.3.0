@@ -2,16 +2,17 @@
 
 namespace App\Models\Custodiado;
 
-use App\Classes\Datas;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Custodiado extends Model
 {
     use HasFactory;
+
     protected $connection = 'siapenweb_dp';
     protected $table      = 'custodiados';
+
     protected $fillable = [
         'pessoa_id',
         'regime_id',
@@ -24,75 +25,88 @@ class Custodiado extends Model
         'idinterno',
     ];
 
-    public function pessoa()
+    /* =======================================================
+     |  RELACIONAMENTOS (FK -> belongsTo)
+     |=======================================================*/
+
+    /** Custodiado pertence a uma Pessoa */
+    public function pessoa(): BelongsTo
     {
-        return $this->hasOne(Pessoa::class, 'id', 'pessoa_id');
+        return $this->belongsTo(Pessoa::class, 'pessoa_id', 'id');
     }
 
-    public function regime()
+    /** Custodiado pertence a um Regime */
+    public function regime(): BelongsTo
     {
-        return $this->hasOne(Regime::class, 'id', 'regime_id');
+        return $this->belongsTo(Regime::class, 'regime_id', 'id');
     }
 
-    public function situacaoAtual()
+    /** Situação Atual do Custodiado */
+    public function situacaoAtual(): BelongsTo
     {
-        return $this->hasOne(CustodiadoSituacaoAtual::class, 'id', 'custodiado_situacao_atual_id');
+        // nome da classe conforme seu projeto
+        return $this->belongsTo(CustodiadoSituacaoAtual::class, 'custodiado_situacao_atual_id', 'id');
     }
 
-    public function regimeSituacaoAtual()
+    /* =======================================================
+     |  ACCESSORS LEVES (PROXIES)
+     |=======================================================*/
+
+    /**
+     * Foto em data URI (se houver). Leve: apenas proxia a Pessoa.
+     * Fallback para no_image.png deve ser feito na Blade:
+     * <img src="{{ $custodiado->foto ?: asset('assets/images/icons/no_image.png') }}">
+     */
+    public function getFotoAttribute(): ?string
     {
-        try {
-            $regime = $this->regime;
-            return $regime->descricao;
-        } catch (\Error $e) {
-            $situacaoAtual = $this->situacaoAtual;
-            return $situacaoAtual->descricao;
-        } catch (\Throwable $th) {
-            return '';
-        }
+        return optional($this->pessoa)->foto_base64;
     }
 
-    public function fotoRel(): HasOne
+    /**
+     * Endereço pronto (linha única), proxia PessoaEndereco::linha_completa.
+     * Use preferencialmente $custodiado->pessoa->endereco->linha_completa diretamente.
+     */
+    public function getEnderecoAttribute(): ?string
     {
-        return $this->hasOne(\App\Models\Custodiado\PessoaFoto::class, 'pessoa_id', 'pessoa_id')
-            ->select(['id', 'pessoa_id', 'img', 'img_type', 'foto_tipo_id', 'foto_posicao_id'])
-            ->orderByRaw("
-            CASE
-                WHEN foto_tipo_id = 1 THEN 0
-                WHEN foto_posicao_id = 1 THEN 1
-                ELSE 2
-            END
-        ")
-            ->orderByDesc('id')
-            ->withDefault(function ($foto) {
-                // força cair no fallback no accessor se não houver imagem
-                $foto->img = null;
-                $foto->img_type = null;
-            });
+        $end = optional($this->pessoa)->endereco;
+        return $end ? $end->linha_completa : null;
     }
 
-    /** Retorna SEMPRE um src exibível (data URI ou asset fallback) */
-    public function getFotoAttribute(): string
+    /**
+     * Atalho opcional para CPF (formatação na model Pessoa).
+     * Pode remover se quiser forçar uso de $custodiado->pessoa->cpf.
+     */
+    public function getCpfAttribute(): ?string
     {
-        // usa a relação se já vier carregada; senão, busca
-        $foto = $this->relationLoaded('fotoRel')
-            ? $this->getRelation('fotoRel')
-            : $this->fotoRel()->first();
+        return optional($this->pessoa)->cpf;
+    }
 
-        if ($foto && !empty($foto->img) && !empty($foto->img_type)) {
-            return "data:{$foto->img_type};base64,{$foto->img}";
-        }
+    /**
+     * Atalho opcional para RG (com UF), também delega à Pessoa.
+     */
+    public function getRgAttribute(): ?string
+    {
+        return optional($this->pessoa)->rg;
+    }
 
-        // Se não houver imagem no banco, lê o arquivo padrão e converte para base64
-        $path = public_path('assets/images/icons/no_image.png');
+    // Mostra só o REGIME (com fallback)
+    public function getRegimeDescricaoAttribute(): string
+    {
+        return $this->regime?->descricao ?? '—';
+    }
 
-        if (file_exists($path)) {
-            $base64 = base64_encode(file_get_contents($path));
-            $mime = mime_content_type($path);
-            return "data:{$mime};base64,{$base64}";
-        }
+    // Mostra só a SITUAÇÃO ATUAL (com fallback)
+    public function getSituacaoAtualDescricaoAttribute(): string
+    {
+        return $this->situacaoAtual?->descricao ?? '—';
+    }
 
-        // fallback final se o arquivo não existir
-        return '';
+    // (Opcional) Mostra os dois juntos, quando fizer sentido
+    public function getRegimeESituacaoRotuloAttribute(): string
+    {
+        return collect([
+            $this->regime?->descricao,
+            $this->situacaoAtual?->descricao,
+        ])->filter()->implode(' / ');
     }
 }

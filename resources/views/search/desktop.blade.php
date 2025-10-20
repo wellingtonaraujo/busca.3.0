@@ -54,11 +54,11 @@
 
                 {{-- Documentos --}}
                 <td class="px-4 py-2">
-                    @forelse ($documentos as $doc)
+                    {{-- @forelse ($documentos as $doc)
                         <p>{{ $doc->documentoTipo }} {{ $model->origem == 'nova' ? $doc->documento_numero : $doc->numero_documento }}</p>
-                    @empty
+                    @empty --}}
                         <span class="text-gray-400">—</span>
-                    @endforelse
+                    {{-- @endforelse --}}
                 </td>
 
                 {{-- Custodiado --}}

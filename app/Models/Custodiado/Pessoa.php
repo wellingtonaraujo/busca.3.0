@@ -225,7 +225,6 @@ class Pessoa extends Model
         }
     }
 
-
     public function fotos(): HasMany
     {
         return $this->hasMany(\App\Models\Custodiado\PessoaFoto::class, 'pessoa_id');
@@ -257,5 +256,10 @@ class Pessoa extends Model
     public function fotoPrincipal()
     {
         return $this->belongsTo(PessoaFoto::class, 'principal_pessoa_foto_id');
+    }
+
+    public function endereco(){
+        // return PessoaEndereco::where('pessoa_id', $this->id)->lasted('id');
+        return $this->hasOne(PessoaEndereco::class, 'pessoa_id', 'id')->ofMany('id', 'max');
     }
 }

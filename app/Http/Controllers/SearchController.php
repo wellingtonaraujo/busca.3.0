@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Custodiado\Custodiado;
 use App\Models\Custodiado\CustodiadoAntigo;
 use App\Models\Custodiado\PessoaAntiga;
+use App\Models\Custodiado\PessoaEnderecoAntigo;
 use App\Models\Custodiado\Regime;
 use App\Models\Custodiado\Vinculado;
 use App\Traits\PageHeaderTrait;
@@ -59,12 +60,17 @@ class SearchController extends Controller
         if ($request->origem === 'antiga') {
             // Carrega tudo que vamos precisar de uma vez (evita N+1)
             $custodiado = CustodiadoAntigo::with([
-                'pessoa',
-                'pessoa.vinculadosComoVisitante',
-                'pessoa.vinculadosComoInterno',
-                'pessoa.documentosAntigos',
-                'pessoa.contatosAntigos',
-                'regime',
+                'pessoa' => function ($q) {
+                    $q->select('id', 'nome', 'alcunha', 'nascimento')
+                        ->with([
+                            'vinculadosComoVisitante',
+                            'vinculadosComoInterno',
+                            'documentosAntigos',
+                            'contatosAntigos',
+                            // 'endereco:idpessoa_endereco,logradouro,numero_complemento,cep,idbairro,referencia',
+                        ]);
+                },
+                'regime:id,descricao',
                 'situacaoAtual',
                 'vinculadoAntigo',
             ])->where('idinterno', $request->custodiado_id)->first();
@@ -82,6 +88,14 @@ class SearchController extends Controller
             // $custodiado->pessoa->documentos, $custodiado->pessoa->contatos,
             // $custodiado->pessoa->vinculados (merge visitante+interno), etc.
 
+            $p = $custodiado->pessoa;
+            $tem = PessoaEnderecoAntigo::where('idpessoa', $p->id)->orderBy('id', 'desc')->first();
+            dd($p->id, $tem);
+            if ($endereco = $custodiado->pessoa->endereco) {
+                dd($endereco);
+                dd($endereco->endereco, $endereco->numero, $endereco->complemento, $endereco->bairro->nome, $endereco->cidade->nome, $endereco->estado->nome, $endereco->pais->nome);
+            }
+
             $titulo = "Consulta Prisional";
             $breadcrumbs = $this->breadcrumbs;
             $otherButtons = $this->buttons;
@@ -94,26 +108,25 @@ class SearchController extends Controller
                 ->with([
                     'pessoa' => function ($q) {
                         $q->select('id', 'nome', 'alcunha', 'nascimento')
-                            ->selectRaw('TIMESTAMPDIFF(YEAR,
-                    COALESCE(
-                        STR_TO_DATE(nascimento, "%Y-%m-%d"),
-                        STR_TO_DATE(nascimento, "%d/%m/%Y")
-                    ),
-                    CURDATE()
-                ) AS idade');
+                            ->with([
+                                'documentosSlim:id,pessoa_id,documento_tipo_id,expedicao_estado_id,expedicao_pais_id,documento_numero,data_expedicao,orgao_expedicao,descricao',
+                                'contatos:id,pessoa_id,contato,vinculado_tipo_id',
+                                'endereco:id,endereco,numero,bairro_id,cep,cidade_id,uf_id,complemento', // ajuste aos nomes reais
+                            ]);
                     },
-                    'pessoa.documentosSlim', // USA A RELAÇÃO LEVE
-                    'pessoa.contatos:id,pessoa_id,contato,vinculado_tipo_id',
                     'regime:id,descricao',
                     'situacaoAtual:id,descricao',
-                    'fotoRel:id,pessoa_id,img,img_type,foto_tipo_id,foto_posicao_id', // <- relação com outro nome
+                    'fotoRel:id,pessoa_id,img,img_type,foto_tipo_id,foto_posicao_id',
                 ])
-                ->where('id', $request->custodiado_id)
-                ->first();
+                ->find($request->custodiado_id);
 
             if (!$custodiado) {
                 Alert::info('Atenção', "Registro não encontrado na base de dados");
                 return redirect()->back()->withInput();
+            }
+
+            if ($endereco = $custodiado->pessoa->endereco) {
+                dd($endereco->endereco, $endereco->numero, $endereco->complemento, $endereco->bairro->nome, $endereco->cidade->nome, $endereco->estado->nome, $endereco->pais->nome);
             }
 
             $titulo = "Consulta Prisional";
